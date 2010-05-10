@@ -1,4 +1,6 @@
-========= PROVIDENCE/CLARITY: A FLEXIBLE PLATFORM FOR DATA ANALYSIS =========
+========= CIRCLE OF INFLUENCE =========
+
+Built on top of the Providence/Clarity platform for use on Google App Engine.
 
 Author: Sam Gammon <sg@samgammon.com>
 Copyright: (c)2010, Sam Gammon. ALL RIGHTS RESERVED.

@@ -1,0 +1,117 @@
+####################### COI APPENGINE CONFIGURATION #######################
+
+application: providenceclarity # application identifier
+version: 'alpha-01' # application version, actually a string
+runtime: python # application runtime (keep at 'python')
+api_version: 1 # runtime api version (keep at '1')
+default_expiration: 1s # set low during dev, high during production
+
+####### -------------- INBOUND SERVICES -------------- #######
+
+inbound_services:
+- xmpp_message
+- mail
+
+####### --------------- ADMIN CONSOLE --------------- #######
+
+# admin console entries
+admin_console: 
+ pages:
+ - url: /_data/manage/appstats/ # the python 'appstats' application
+   name: "AppStats"
+ - url: /_data/manage/sources/ # data sources management for P/C
+   name: "Data Sources"
+
+# URL handlers
+handlers:
+
+####### --------------- ASSET HANDLERS --------------- #######
+
+- url: /assets/images/static # static filesystem images
+  static_dir: app/assets/images/static
+- url: /assets/images/.* # dynamic datastore image handler
+  script: app/assets/images/retrieve.py
+- url: /assets/style/static # static filesystem stylesheets
+  static_dir: app/assets/style/static
+- url: /assets/style/.* # dynamic datastore stylesheet handler
+  script: app/assets/style/retrieve.py
+- url: /assets/js/static # static filesystem javascript
+  static_dir: app/assets/js/static
+- url: /assets/js/.* # dynamic datastore javascript handler
+  script: app/assets/js/retrieve.py
+- url: /assets/bin/static
+  static_dir: app/assets/bin/static
+- url: /assets/bin/.*
+  script: app/assets/bin/retrieve.py
+- url: /assets/flash/static # static filesystem flash handler
+  static_dir: app/assets/flash/static # (no dynamicly-served flash)
+
+####### --------------- SERVICE HANDLERS --------------- #######
+
+### Workers
+- url: /_ah/queue/deferred # deferred queue, for general tasks
+  script: $PYTHON_LIB/google/appengine/ext/deferred/deferred.py
+  login: admin
+- url: /_ah/worker/outgoing/.* # outgoing mail/xmpp queue
+  script: services/workers/outgoing.py
+  login: admin
+- url: /_ah/worker/data/.* # queue for digesting and categorizing data
+  script: services/workers/data.py
+  login: admin
+- url: /_ah/worker/indexer/.* # queue to index models for fulltext and keyword search
+  script: services/workers/indexer.py
+  login: admin
+- url: /_ah/worker/cacher/.* # queue to cache backend data structures and frontend output
+  script: services/workers/cacher.py
+  login: admin
+
+### Incoming Services
+- url: /_ah/xmpp/message/chat/ # incoming XMPP/Jabber
+  script: services/incoming/xmpp.py
+  login: admin
+- url: /_ah/mail/.+ # All incoming mail addresses
+  script: services/incoming/mail.py
+  login: admin
+
+### Remoting Endpoints
+- url: /_data/remoting/amf.* # Action Message Format for flash/flex clients
+  script: services/remoting/endpoints/amf.py
+- url: /_data/remoting/json.* # JavaScript Object Notation for general access
+  script: services/remoting/enpoints/json.py
+- url: /_data/remoting/xml.* # eXtensible Markup Language for general access
+  script: services/remoting/endpoints/xml.py
+- url: /_data/remoting/xmpp.* # XMPP gateway for chat + other simple package access
+  script: services/remoting/endpoints/xmpp.py
+ 
+
+####### --------------- VIEW HANDLERS --------------- #######
+
+
+### Administrative Views
+- url: /_data/manage/appstats/.*
+  script: $PYTHON_LIB/google/appengine/ext/appstats/ui.py
+  login: admin
+- url: /_data/manage/sources/.*
+  script: views/admin/sources.py
+  login: admin
+- url: /_data/manage/console/.* # exposes the official app engine control panel
+  script: $PYTHON_LIB/google/appengine/ext/admin
+  login: admin
+- url: /_data/manage/.* # exposes the final official management app. not the devsite!
+  script: views/admin/index.py
+  login: admin
+
+### Data Stuff
+- url: /_data/remote_api
+  script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
+  login: admin
+- url: /_data/.*
+  script: services/data.py
+  login: admin  
+
+################## FRONTEND CIRCLE OF INFLUENCE SITE:
+  
+- url: /.*
+  script: main.py
+  secure: optional
+  login: admin
