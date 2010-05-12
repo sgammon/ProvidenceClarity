@@ -1,5 +1,6 @@
 import logging, os, sys
 from google.appengine.ext import db
+try: import pc_config except ImportError: pass
 from ProvidenceClarity.data.core.model import Model
 from ProvidenceClarity.data.core.properties.polymodel import _ClassKeyProperty, _ModelPathProperty
 

@@ -16,6 +16,18 @@ class NormalizedStringListProperty(db.StringListProperty):
             else:
                 final_list.append(str(item).decode('utf-8').lower())
         return final_list
+        
+## +=+=+ Serializes/deserializes list object on access instead of on fetch
+class ListProperty(db.ListProperty):
+    pass
+
+## +=+=+ Serializes/deserializes date object on access instead of on fetch
+class DateTimeProperty(db.DateTimeProperty):
+    pass
+    
+## +=+=+ Automatically converts in and out of JSON objects from text properties.
+class JSONProperty(db.TextProperty):
+    pass
 
 ## +=+=+ Automatically converts in and out of RDF objects from text properties.
 class RDFProperty(db.TextProperty):
