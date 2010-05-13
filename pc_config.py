@@ -2,7 +2,6 @@ import os
 
 config = {
 
-
     'data':
     {
         'index_on_put': True
