@@ -4,28 +4,28 @@ from ProvidenceClarity.data.core.polymodel import PolyModel
 from ProvidenceClarity.data.core.properties import util
 
 ## +=+=+ Master class - retrieves referenced PC data object only on get instead of fetch.
-class PCReferenceProperty(db.ReferenceProperty):
+class PCRef(db.ReferenceProperty):
     pass
 
-class PCReverseReferenceProperty(db.ReverseReferenceProperty):
+class PCReverseRef(db.ReverseReferenceProperty):
     pass
 
 ## +=+=+ Entity reference (E)
-class EReference(PCReferenceProperty):
+class ERef(PCReferenceProperty):
     pass
     
-class ReverseEReference(PCReverseReferenceProperty):
+class ReverseERef(PCReverseReferenceProperty):
     pass
     
-class EReferenceList(util.ListProperty):
+class ERefList(util.ListProperty):
     pass
     
 ## +=+=+ Connection reference (C)
-class CReference(PCReferenceProperty):
+class RRef(PCReferenceProperty):
     pass
     
-class ReverseCReference(PCReverseReferenceProperty):
+class ReverseRRef(PCReverseReferenceProperty):
     pass
     
-class CReferenceList(util.ListProperty):
+class RRefList(util.ListProperty):
     pass

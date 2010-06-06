@@ -1,11 +1,24 @@
-import logging, os, sys
+import logging
+import sys
+import os
+
 from google.appengine.ext import db
-try: import pc_config except ImportError: pass
 from ProvidenceClarity.data.core.model import Model
-from ProvidenceClarity.data.core.properties.polymodel import _ClassKeyProperty, _ModelPathProperty
+from ProvidenceClarity.data.core.properties.polymodel import _ClassKeyProperty
+from ProvidenceClarity.data.core.properties.polymodel import _ModelPathProperty
+
+try:
+    import pc_config
+except ImportError:
+    pass
+
+_PATH_PREFIX = pc_config.get('path_prefix','data',False)
+_IMPORT_PREFIX = pc_config.get('import_prefix','data',False)
 
 _CLASS_KEY_PROPERTY = '_class_key_'
 _PATH_KEY_PROPERTY  = '_class_path_'
+
+_PATH_SEPERATOR = ':'
 
 _class_map = {}
 
@@ -60,17 +73,18 @@ class PolyModel(Model):
         | E |
         -----
           |
-          --------------------
-             |               |
-        -----------       --------
-        | GeoArea |       | Role |
-        -----------       --------
+          ---------------------------------
+             |               |            |
+        -----------       --------       ----------
+        | GeoArea |       | Role |       | Person |
+        -----------       --------       ----------
              |                |
-             |                ---------------------
-        ------------              |               |
-        | US State |         |------------|  |-----------|
-        ------------         | Legislator |  | President |
-                             |------------|  |-----------|
+             |                |
+        ------------          ---------------------
+        | US State |              |               |
+        ------------        --------------  -------------
+                            | Legislator |  | President |
+                            --------------  -------------
                                    |
                             ---------------
                             |             |
@@ -146,7 +160,7 @@ class PolyModel(Model):
         if not hasattr(cls, _PATH_KEY_PROPERTY):
             return tuple(i for i in str(cls.__module__+'.'+cls.__name__).split('.'))
         else:
-            path_t = getattr(cls, _PATH_KEY_PROPERTY).split('::')
+            path_t = getattr(cls, _PATH_KEY_PROPERTY).split(_PATH_SEPERATOR)
             return tuple('.'.join(path_t).split('.'))
     
     def path_module(self):
@@ -154,7 +168,7 @@ class PolyModel(Model):
         if not hasattr(self, _PATH_KEY_PROPERTY):
             return tuple(self.__module__.split('.'))
         else:
-            path_t = getattr(self, _PATH_KEY_PROPERTY).split('::')
+            path_t = getattr(self, _PATH_KEY_PROPERTY).split(_PATH_SEPERATOR)
             return tuple(path_t[0].split('.'))
 
     def path_module_name(self):
@@ -162,7 +176,7 @@ class PolyModel(Model):
         if not hasattr(self, _PATH_KEY_PROPERTY):
             return str(self.__module__)
         else:
-            path_t = getattr(self, _PATH_KEY_PROPERTY).split('::')
+            path_t = getattr(self, _PATH_KEY_PROPERTY).split(_PATH_SEPERATOR)
             return path_t[0]
             
     @classmethod
@@ -181,15 +195,17 @@ class PolyModel(Model):
             try:
                 
                 ### split away path from class name
-                class_path_t = key.split('::')
+                class_path_t = key.split(_PATH_SEPERATOR)
                 
                 #### build and execute an import statement to lazy-load the implementation class
-                exec 'from '+class_path_t[0]+' import '+class_path_t[1]
+                if _IMPORT_PREFIX is not False:
+                    if _IMPORT_PATH[-1] != '.': _IMPORT_PATH = _IMPORT_PATH+'.'
+                    class_path_t[0] = str(_IMPORT_PATH)+str(class_path_t[0])
+                __import__(class_path_t[0], globals(), locals(), [class_path_t[1]], -1)    
 
                 #### instantiate an empty class of the requested type
                 obj = eval(class_path_t[1],globals(),locals())()
                     
-                
                 #### add the class to the _class_map... polymodel will do the rest
                 _class_map[obj.class_key()] = obj.__class__
                 
