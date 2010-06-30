@@ -1,0 +1,23 @@
+<html>
+
+	<head>
+		<title>{{ page.title }}{% if sys.config.platform.name %} - {{ sys.platform.name }}{% endif %}</title>
+		<meta name="X-Platform" value="Providence/Clarity (v{{ sys.version }} {{ sys.build }})">
+
+		{% include "__north.html" %}
+				
+		<style>
+			{% include "__universal_style.css" %}{% block style %}{% endblock %}
+		</style>
+		
+		{% block head %}{% endblock %}
+	
+	</head>
+	
+	<body{% if page.bgclass %} class="{{ page.bgclass }}"{% endif %}>
+		{% block body %}{% endblock %}
+	</body>
+	
+	{% include "__south.html" %}
+
+</html>

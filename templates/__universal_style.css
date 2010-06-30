@@ -1,0 +1,52 @@
+*
+{
+    font-family:Verdana, Arial;
+    font-size:13px;
+    padding:0;
+    margin:0;
+}
+
+.float_left
+{
+    float:left;
+}
+
+.float_right
+{
+    float:right;
+}
+
+.clear_left
+{
+    clear:left;
+}
+
+.clear_right
+{
+    clear:right;
+}
+
+.clear_both
+{
+    clear:both;
+}
+
+.hidden
+{
+    visibility:hidden;
+}
+
+.visible
+{
+    visibility:normal;
+}
+
+.inline
+{
+    display:inline;
+}
+
+.block
+{
+    display:block;
+}

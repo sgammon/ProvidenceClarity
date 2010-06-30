@@ -18,7 +18,8 @@ class P(Model, CreatedModifiedMixin):
     description = db.TextProperty(required=False,indexed=False,verbose_name="Description")
 
     ## Ancestor path
-    parent = db.SelfReferenceProperty(required=True,default=None,indexed=True,collection_name="children",verbose_name="Child Protos")
+    direct_parent = db.SelfReferenceProperty(required=True,default=None,indexed=True,collection_name="children",verbose_name="Direct Parent")
+    ancestry_path = db.ListProperty(basestring,required=True,default=None,indexed=True,verbose_name="Ancestry Path")
     abstract = db.BooleanProperty(required=True,default=False,indexed=False,verbose_name="Abstract?")
     
     ## Data Ancestry/Usage Properties
@@ -31,9 +32,9 @@ class P(Model, CreatedModifiedMixin):
     created_modified = db.BooleanProperty(required=True,default=False,indexed=True,verbose_name="Created/modified?")
 
     ## Special Properties
-    keyname_use = db.StringProperty(required=False,indexed=False,verbose_name="Key Name Usage")
-    keyid_use = db.StringProperty(required=False,indexed=False,verbose_name="Key ID Usage")
-    keyparent_use = db.StringProperty(required=False,indexed=False,verbose_name="Key Parent Usage")
+    keyname_use = db.StringProperty(required=False,default=None,indexed=False,verbose_name="Key Name Usage")
+    keyid_use = db.StringProperty(required=False,default=None,indexed=False,verbose_name="Key ID Usage")
+    keyparent_use = db.StringProperty(required=False,default=None,indexed=False,verbose_name="Key Parent Usage")
 
     ## List of fields and field types
     fields = NormalizedStringListProperty(required=True,indexed=True,verbose_name="Proto Fields")
@@ -73,47 +74,3 @@ class ProtoModel:
                 dat[proto.fields[item]] = proto.field_types[item]
             return dat
         return None
-        
-##### ###   Built-In Protos (for dev or first data)   ### #####
-
-def devAddProtos():
-    
-    models = []
-
-    models.append(P(key_name='P',name=['Prototype'],description='Describes a data kind\'s schema, including properties, property types, and details about whether it is abstract or derived.',
-                    abstract=True,derived=False,is_data=False,poly_model=False,uses_keyname=True,uses_parent=True,uses_id=False,created_modified=True,
-                    keyname_use='System data kind name.',keyparent_use='',
-                    fields=['name','description','parent','abstract','derived','is_data','fields','field_types'],
-                    field_types=['str_list','text','self_ref','bool','bool','bool','str_list','str_list']))
-                    
-    models.append(P(key_name='E',name=['Entity'],description='A basic, abstract unit of system data. Everything that can be represented by a single record inherits from Entity.',
-                    abstract=True,derived=False,is_data=False,poly_model=True,uses_keyname=True,uses_parent=True,uses_id=True,created_modified=True,
-                    keyname_use='Variable, depending on child protos.',keyparent_use='',keyid_use='',                    
-                    fields=['primary_display_text','display_text','modified','created'],
-                    field_types=['str','str_list','created','modified']))
-                    
-    models.append(P(key_name='R',name=['Relation'],description='Represents a relation between two Entity records. Relation kind represents the type of relationship, while individual records store details of the connection.',
-                    abstract=True,derived=False,is_data=False,poly_model=True,uses_keyname=True,uses_parent=True,uses_id=False,created_modified=True,
-                    keyname_use='Variable, depending on child protos.',keyparent_use='Used for direction connections (parent is source).',
-                    fields=['entities','origin','end'],
-                    field_types=['e_ref_list','e_ref','e_ref']))
-                    
-    models.append(P(key_name='D',name=['Descriptor'],description='A small unit of data that can be attached to other data points. Can be extended and created on the fly.',
-                    abstract=True,derived=False,is_data=False,poly_model=True,uses_keyname=True,uses_parent=True,uses_id=False,created_modified=True,
-                    keyname_use='Name of descriptor.',keyparent_use='Data point descriptor is attached to.',
-                    fields=['parent_key'],
-                    field_types=['str']))
-                    
-    models.append(P(key_name='I',name=['Index'],description='A normalized, high-level index that can be extended and created/generated on the fly.',
-                    abstract=True,derived=False,is_data=False,poly_model=True,uses_keyname=True,uses_parent=True,uses_id=False,created_modified=True,
-                    keyname_use='Variable, depending on child protos.',keyparent_use='Proto this indexes, if applicable.',
-                    fields=['name','description'],
-                    field_types=['str','text']))
-                    
-    models.append(P(key_name='C',name=['Cache'],description='Model structure for storing hard-to-retrieve or hard-to-generate data for easy access.',
-                    abstract=True,derived=False,is_data=False,poly_model=True,uses_keyname=True,uses_parent=True,uses_id=True,created_modified=True,
-                    keyname_use='Variable, depending on child protos.',keyparent_use='Proto or data point to be cached.',keyid_use='Variable, depending on child protos.',
-                    fields=['expiration_enabled','expiration_datetime','modified','created'],
-                    field_types=['bool','datetime','modified','created']))
-    
-    

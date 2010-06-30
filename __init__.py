@@ -16,9 +16,9 @@ __all__ = ['api','data','services','main']
 
 ## Declare Globals
 version_major = 0.5
-version_minor = 1.28
-build = 'DEV'
+version_minor = 1.31
 config_module = None
+build = 'DEV'
 
 ## Init and return a ProvidenceClarity object
 def initialize(config='pc_config_default'):
@@ -26,12 +26,13 @@ def initialize(config='pc_config_default'):
     # === 0: Grab Globals
     global version_major
     global version_minor
-    global build
     global config_module
+    global build
 
     # === 1: Path Inserts
     if '.' not in sys.path:
         sys.path.insert(0,'.')
+        sys.path.insert(1,'lib')
 
     # === 2: Load Config
     try: config_mod = __import__(config,globals(),locals(),[],-1);

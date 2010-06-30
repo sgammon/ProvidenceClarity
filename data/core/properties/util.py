@@ -22,6 +22,14 @@ class ListProperty(db.ListProperty):
     pass
 
 ## +=+=+ Serializes/deserializes date object on access instead of on fetch
+class DateProperty(db.DateTimeProperty):
+    pass
+    
+## +=+=+ Serializes/deserializes time object on access instead of on fetch
+class TimeProperty(db.DateTimeProperty):
+    pass    
+
+## +=+=+ Serializes/deserializes datetime object on access instead of on fetch
 class DateTimeProperty(db.DateTimeProperty):
     pass
     
@@ -35,5 +43,5 @@ class RDFProperty(db.TextProperty):
     def get_value_for_datastore(self, model_instance):
         pass
     
-    def make_value_for_datastore(self, value):
+    def make_value_from_datastore(self, value):
         pass

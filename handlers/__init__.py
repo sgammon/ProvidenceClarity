@@ -5,6 +5,10 @@ from ProvidenceClarity.main import *
 
 class RequestHandler(ProvidenceClarity, webapp.RequestHandler):
     
+    def render_raw(self, content):
+        
+        self.response.out.write(content)
+        
     def render(self,page,**kwds):
         
         ######## //    Page   // ########
@@ -80,4 +84,4 @@ class RequestHandler(ProvidenceClarity, webapp.RequestHandler):
         source = source+page
         
         ## set headers, render, and go
-        rendered_page = template.render(templ)
+        self.render_raw(template.render(templ))

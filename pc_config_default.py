@@ -3,6 +3,12 @@ import logging
 
 config = {
 
+    'platform':
+    {
+        'name':'Providence/Clarity',
+        'public':False
+    },
+
     'logging':
     {
         'handler':logging,
@@ -19,6 +25,7 @@ config = {
     
     'handlers':
     {
+        'page_caching':True,
         'template_root':'templates/',
         'images_url':'/assets/images/static/p-c/',
         'style_url':'/assets/style/static/p-c/',
