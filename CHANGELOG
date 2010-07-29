@@ -1,0 +1,18 @@
+==== Providence/Clarity Changelog ====
+
+
+0.1.5.100 DEV:
+-- added modelmixin class to data core
+-- added useraudit class to data util
+-- added storage API package
+-- added webstorage class to storage API
+-- added blobstore class to storage API
+-- added handler routes to app.yaml and gateway.py
+-- added handlers to handlers.util for 403 and 404 error
+-- added matching error 403 and 404 templates
+-- added google news service adapter, with methods
+-- added proper inheritance to opencalais service adapter
+-- added configuration properties to serviceadapter parent class
+-- added config properties to pc_config for opencalais and google news
+-- added actual methods to the opencalais, googlenews, and freebase service adapters
+-- created new ServiceAdapter and ServiceRequest data classes
