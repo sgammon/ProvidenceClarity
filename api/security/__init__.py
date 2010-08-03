@@ -112,7 +112,7 @@ class KeyController(object):
         
         key_value, key_hash = cls.provision_key_content(str(account_obj.key()),pc_config.get('token_key_hash_algorithm','security',pc_config.get('security','key_default_hash_algorithm','md5')))
     
-        return (key_value, Token(key_name=key_value, content=key_value, md5_hash=key_hash).put())
+        return (key_value, Token(key_name=key_value, content=key_value, md5_hash=key_hash).put())        
         
     @classmethod
     def use_token(cls, token_value):
@@ -123,3 +123,66 @@ class KeyController(object):
            return True 
         else:
             raise exceptions.KeyNotFound
+            
+            
+class SecurityKeyController(object):
+
+    ## Checks and increments for use
+    @classmethod    
+    def checkValidAndIncrement(cls,key):
+        
+        if cls.checkValid(key) is True:
+            
+            key.use_tally = key.use_tally+1
+            key.put()
+            
+            return True
+            
+        else:
+            return False
+
+    ## Checks activation and expiration
+    @classmethod    
+    def checkValid(cls, key):
+        
+        try:
+            # check activation
+            if key.activated != True:
+                raise exceptions.KeyNotActivated
+            
+            # check banned
+            if key.banned != False:
+                raise exceptions.KeyBanned(key.banned_reason)
+            
+            # check manual expiration
+            if key.expired != False:
+                raise exceptions.KeyExpired()
+            
+            # check expiry date
+            if key.expiration is not None and datetime.datetime.now() > key.expiration:
+                raise exceptions.KeyExpired()            
+            
+            # check lifetime
+            if key.lifetime is not None:
+                delta = datetime.timedelta(seconds=key.lifetime)
+                if datetime.datetime.now() > key.dateCreated+delta:
+                    raise exceptions.KeyExpired()
+                    
+            # check usage limit
+            if config.get('security','key_invalid_access_limit',True) < key.use_tally:
+                raise exceptions.KeyAccessLimitReached 
+                    
+        except:
+            
+            # Increment error and put
+            key.error_tally = key.error_tally+1
+            key.put()
+            
+            # Re-raise exception and return false
+            raise sys.exc_info()[0]
+            return False
+            
+        else:
+            
+            # Return true if all tests pass
+            return True

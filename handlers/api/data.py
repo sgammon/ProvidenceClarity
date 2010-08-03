@@ -1,7 +1,38 @@
+import logging
+from google.appengine.ext import db
 from . import DataAPIHandler
 
 from ProvidenceClarity.data import entity, proto, index, cache, descriptor, relationship
 
+
+def get_type_q(typename):
+    
+    _type = str(typename).lower()
+    
+    if _type == 'entity':
+        q = entity.E
+        
+    elif _type == 'proto':
+        q = proto.P
+        
+    elif _type == 'index':
+        q = index.I
+        
+    elif _type == 'cache':
+        q = cache.C
+        
+    elif _type == 'descriptor':
+        q = descriptor.D
+        
+    elif _type == 'relationship':
+        q = relationship.R
+        
+    else:
+        ## @TODO: Error handling here
+        q = False
+        
+    return q
+    
 
 class MasterTypeListHandler(DataAPIHandler):
     
@@ -11,34 +42,34 @@ class MasterTypeListHandler(DataAPIHandler):
         
         self.respond(response)
         
+        
+class MasterQueryHandler(DataAPIHandler):
+    
+    def get(self):
+        
+        _gql = self.request.get('gql',default_value=None)
+
+        if _gql is not None:
+            self.query['is_gql'] = True
+            self.query['gql'] = _gql
+                
+            self.respond(q.fetch(limit=self.query['limit'], offset=self.query['offset']))
+            
+        else:
+            self.errors.append({'error':'EMPTY_GQL','param':'GQL','msg':'The \'gql\' parameter must be non-empty.'})
+            self.result = 'failure'
+            
+            self.respond()
+
+        
+        self.respond([])
+        
 
 class TypeListHandler(DataAPIHandler):
     
     def get(self, _type):
-        
-        _type = str(_type).lower()
-        
-        i_limit = int(self.request.get('limit',default_value='20'))
-        i_offset = int(self.request.get('offset',default_value='0'))
-        
-        if _type == 'entity':
-            q = entity.E.all().fetch(limit=i_limit, offset=i_offset)
-            
-        elif _type == 'proto':
-            q = proto.P.all().fetch(limit=i_limit, offset=i_offset)
-            
-        elif _type == 'index':
-            q = index.I.all().fetch(limit=i_limit, offset=i_offset)
-            
-        elif _type == 'cache':
-            q = cache.C.all().fetch(limit=i_limit, offset=i_offset)
-            
-        elif _type == 'descriptor':
-            q = descriptor.D.all().fetch(limit=i_limit, offset=i_offset)
-            
-        elif _type == 'relationship':
-            q = relationship.R.all().fetch(limit=i_limit, offset=i_offset)
-            
+                            
+        q = db.Query(get_type_q(_type), keys_only=self.query['keys_only']).fetch(limit=self.query['limit'], offset=self.query['offset'])
          
         self.respond(q)
         
@@ -66,6 +97,34 @@ class CreateTypeHandler(DataAPIHandler):
     def post(self, key):
         pass
     
+
+class QueryTypeHandler(DataAPIHandler):
+    
+    def get(self, _type):
+        
+        _gql = self.request.get('gql',default_value=None)
+
+        if _gql is not None:
+            self.query['is_gql'] = True
+            self.query['gql'] = _gql
+        
+            if self.query['keys_only'] == True:
+                prefix = 'SELECT __key__ FROM '
+            else:
+                prefix = 'SELECT * FROM '
+        
+        
+            q = db.GqlQuery(prefix+str(get_type_q(_type).__name__)+' '+_gql)
+            logging.info('QUERY: '+prefix+str(get_type_q(_type).__name__)+' '+_gql)
+        
+            self.respond(q.fetch(limit=self.query['limit'], offset=self.query['offset']))
+            
+        else:
+            self.errors.append({'error':'EMPTY_GQL','param':'GQL','msg':'The \'gql\' parameter must be non-empty.'})
+            self.result = 'failure'
+            
+            self.respond()
+        
     
 class CreateEntityHandler(DataAPIHandler):
     

@@ -1,4 +1,6 @@
 from google.appengine.ext import db
+from ProvidenceClarity.data.entity import E
+#from ProvidenceClarity.data.relationship import R
 from ProvidenceClarity.data.core.model import Model
 from ProvidenceClarity.data.core.polymodel import PolyModel
 from ProvidenceClarity.data.core.properties import util
@@ -7,25 +9,24 @@ from ProvidenceClarity.data.core.properties import util
 class PCRef(db.ReferenceProperty):
     pass
 
-class PCReverseRef(db.ReverseReferenceProperty):
-    pass
-
 ## +=+=+ Entity reference (E)
-class ERef(PCReferenceProperty):
-    pass
-    
-class ReverseERef(PCReverseReferenceProperty):
-    pass
-    
+class ERef(PCRef):
+
+    def __init__(self, **kwds):
+        super(ERef, self).__init__(E, **kwds)
+        
 class ERefList(util.ListProperty):
-    pass
+
+    def __init__(self, **kwds):
+        super(ERefList, self).__init__(db.Key, **kwds)
     
 ## +=+=+ Connection reference (C)
-class RRef(PCReferenceProperty):
-    pass
-    
-class ReverseRRef(PCReverseReferenceProperty):
-    pass
-    
-class RRefList(util.ListProperty):
-    pass
+#class RRef(PCRef):
+#
+#    def __init__(self, **kwds):
+#        super(RRef, self).__init__(R, **kwds)
+#        
+#class RRefList(util.ListProperty):
+#
+#    def __init__(self, **kwds):
+#        super(RRefList, self).__init__(db.Key, **kwds)

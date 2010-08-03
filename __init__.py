@@ -20,6 +20,10 @@ version_minor = 1.31
 config_module = None
 build = 'DEV'
 
+## Expose Import-able Variables
+VERSION = str(version_major)+'.'+str(version_minor)+' '+str(build)
+PC_PATH = os.path.join(os.path.dirname(__file__))
+
 ## Init and return a ProvidenceClarity object
 def initialize(config='pc_config_default'):
 

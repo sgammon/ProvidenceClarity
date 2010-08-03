@@ -1,1 +1,6 @@
-## SCAPER INIT
+from .. import InputAdapter
+
+
+class Scraper(InputAdapter):
+    
+    pass

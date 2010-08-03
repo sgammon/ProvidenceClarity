@@ -6,6 +6,13 @@ from ProvidenceClarity.data.mapreduce import MapperParam
 from ProvidenceClarity.data.core.polymodel import PolyModel
 
 
+class AnalyzerEngine(PolyModel, CreatedModifiedMixin):
+    
+    """ Abstract ancestor class describing a data processing engine that can be used by the Analyzer module. """
+    
+    handler_path = db.StringProperty()
+    
+
 class DataJob(PolyModel, CreatedModifiedMixin):
 
     """ Abstract ancestor class describing a data processing job. """
@@ -13,6 +20,10 @@ class DataJob(PolyModel, CreatedModifiedMixin):
     status = db.StringProperty(choices=['queued','paused','processing','error','complete'])
     in_data = db.ReferenceProperty(DataInput, collection_name="jobs")
     out_storage = db.StringProperty(choices=['datastore','blobstore','bigstorage'])
+    
+    ## Job Progress
+    analyzer_process = db.ListProperty(db.Key)
+    current_analyzer = db.ReferenceProperty(AnalyzerEngine, collection_name="current_jobs")
     
     ## Status Flags
     complete = db.BooleanProperty()
@@ -75,6 +86,20 @@ class ProtoHelper(DataManager):
                                     direct_parent=db.Key.from_path('Proto','DataJob'),ancestry_path=['DataJob'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
         
+        return self.models
+
+    def base(self):
+        
+        self.models.append(AnalyzerEngine(key_name='object',
+                            handler_path='ProvidenceClarity.api.analyzer.object'))
+                            
+        self.models.append(AnalyzerEngine(key_name='relation',
+                            handler_path='ProvidenceClarity.api.analyzer.relation'))
+                            
+        self.models.append(AnalyzerEngine(key_name='stat',
+                            handler_path='ProvidenceClarity.api.analyzer.stat'))
+        
+
         return self.models
 
 

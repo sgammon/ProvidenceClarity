@@ -1,5 +1,11 @@
 ==== Providence/Clarity Changelog ====
 
+0.1.5.101 DEV:
+-- added class import logging to data.core.polymodel.PolyModel
+-- accidentally deleted a number of project files, recovered them
+-- VERSION, PC_PATH variables added to __init__ in ProvidenceClarity
+-- changed pc_config format to follow module that config is used in instead of arbitrary package
+
 
 0.1.5.100 DEV:
 -- added modelmixin class to data core

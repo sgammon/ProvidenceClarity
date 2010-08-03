@@ -1,1 +1,5 @@
-## ANALYZER INIT
+
+
+class AnalyzerController(object):
+    
+    pass

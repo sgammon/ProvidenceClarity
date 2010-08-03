@@ -1,21 +1,48 @@
 import logging, sys
 from . import DataManager
+from . import DataController
+
+from ProvidenceClarity import pc_config
 
 from ProvidenceClarity.data.proto import P
 
-class ProtoController(object):
+do_log = pc_config.get('log_imports','api.data.proto.ProtoController',False)
 
+class ProtoController(object):
+            
     @classmethod
-    def import_helper(cls, module, fromlist=['*']):
+    def import_helper(cls,name, fromlist=None):
+        
+        if do_log: logging.info("[i]: MODULE REQUEST: "+str(name)+' with fromlist: '+str(fromlist))
         
         try:
-            helper = __import__(module,globals(),locals(),fromlist)
-            return helper
+            
+            if fromlist == None:
+                mod = __import__(name)
 
+            elif isinstance(fromlist, list):
+                
+                if len(fromlist) == 1:
+                    mod = __import__(name+'.'+fromlist[0])
+                    if do_log: logging.info("[i]: ====== Import Statement: \""+name+'.'+fromlist[0]+'".')
+
+                elif len(fromlist) > 1:
+                    mod = __import__(name+'.'+'.'.join(fromlist))
+                    if do_log: logging.info("[i]: ====== Import Statement: \""+name+'.'+'.'.join(fromlist)+'".')                    
+
+            components = name.split('.')
+            for comp in components[1:]:
+                mod = getattr(mod, comp)
+                if do_log: logging.info("[i]: ========== Traversing "+str(mod)+" for "+str(comp)+'.')
+            
+            if do_log: logging.info("[i]: ====== Returning "+str(mod)+'.')
+            return mod
+            
         except ImportError:
-            #@TODO: Find a way to store errors in datastore
-            logging.info('[i]: Error importing module '+str(module)+' with fromlist '+str(fromlist))
+            if do_log: logging.info("[i]: ====== ImportError exception encountered: \""+str(name)+"\" with fromlist: \""+str(fromlist)+"\".")
+            #TODO: Find a way to store errors in the datastore
             return False
+            
             
     @classmethod
     def _perform_inserts(cls, module):
@@ -28,6 +55,18 @@ class ProtoController(object):
             return False
 
         return helper.do_insert()
+
+    @classmethod
+    def _perform_base(cls, module):
+        
+        helper = cls.import_helper(module)
+        
+        if helper is not False and hasattr(helper, 'ProtoHelper'):
+            helper = helper.ProtoHelper()
+        else:
+            return False
+
+        return helper.do_base()
         
     @classmethod
     def _perform_clean(cls, module):
@@ -96,6 +135,15 @@ class ProtoController(object):
             
         else:
             return cls._recursive_action(cls.import_helper(module), 'do_insert')
+            
+    @classmethod
+    def perform_base(cls, module, recursive=False):
+        
+        if recursive is False:
+            return cls._perform_base(module)
+            
+        else:
+            return cls._recursive_action(cls.import_helper(module), 'do_base')
                     
     @classmethod
     def perform_clean(cls, module, recursive=False):

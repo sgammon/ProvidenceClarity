@@ -1,6 +1,7 @@
 from google.appengine.ext import db
 from ProvidenceClarity.api.data import DataManager
 from ProvidenceClarity.data.util import CreatedModifiedMixin
+from ProvidenceClarity.data.data import DataStub
 from ProvidenceClarity.data.core.polymodel import PolyModel
 
 class DataInput(PolyModel, CreatedModifiedMixin):
@@ -8,16 +9,24 @@ class DataInput(PolyModel, CreatedModifiedMixin):
     """ Abstract ancestor class for data input classes (receivers and scrapers). """
     
     description = db.TextProperty()
-    inactive = db.BooleanProperty()
+    enabled = db.BooleanProperty(default=True)
     data_type = db.StringProperty(choices=['xml','json','html','text','rdf','binary'])
     storage_backend = db.StringProperty(choices=['datastore','blobstore','bigstorage'])
+    stub = db.ReferenceProperty(DataStub)
+    
 
-
-class DataReceiver(DataInput, CreatedModifiedMixin): """ Represents an endpoint for receiving data sent to P/C. """
+class DataReceiver(DataInput, CreatedModifiedMixin):
+    
+    """ Represents an endpoint for receiving data sent to P/C. """
+    
+    data_handler = db.ListProperty(basestring,default=None)
+    discard_after_handler = db.BooleanProperty(default=True)
+    
+    
 class DataScraper(DataInput, CreatedModifiedMixin): """ Describes a data scraper. Usually runs on a cron. """
 class DataSource(DataInput, CreatedModifiedMixin): """ Describes a source of data to be consumed by the system. """
 class DataFeed(DataInput, CreatedModifiedMixin): """ Describes a feed of data to be consumed by the system. """
-class DataEntry(PolyModel, CreatedModifiedMixin): """ Describes an entry in a feed of data to be consumed by the system. """
+
 
 ## Proto Inserts
 
@@ -46,10 +55,6 @@ class ProtoHelper(DataManager):
         self.models.append(self.P(_class=DataFeed,
                                     direct_parent=db.Key.from_path('Proto','DataInput'),ancestry_path=['DataInput'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True))
-                                   
-        self.models.append(self.P(_class=DataEntry,
-                                    direct_parent=None,ancestry_path=[],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
-                                   created_modified=True))
         
         return self.models
     
@@ -61,6 +66,5 @@ class ProtoHelper(DataManager):
         self.models.append(self.P.get_by_key_name('DataScraper'))
         self.models.append(self.P.get_by_key_name('DataSource'))
         self.models.append(self.P.get_by_key_name('DataFeed'))
-        self.models.append(self.P.get_by_key_name('DataEntry'))
         
-        return self.models    
+        return self.models

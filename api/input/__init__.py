@@ -1,1 +1,5 @@
-## INPUT INIT
+from .. import AdapterInterface
+
+
+class InputAdapter(AdapterInterface):
+    pass

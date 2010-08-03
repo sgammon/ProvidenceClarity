@@ -1,13 +1,25 @@
 <html>
 
 	<head>
-		<title>{{ page.title }}{% if sys.config.platform.name %} - {{ sys.platform.name }}{% endif %}</title>
-		<meta name="X-Platform" value="Providence/Clarity (v{{ sys.version }} {{ sys.build }})">
+		
+		{% spaceless %}
+
+		{% if page.title %}
+		<title>{{ page.title }} {% if sys.config.platform.name %}- {{ sys.config.platform.name }}, {% endif %}Powered by Providence/Clarity (v{{ sys.version }}{% if sys.build %} {{ sys.build }}){% else %}){% endif %}
+		</title>
+
+		{% else %}
+		<title>{% if sys.config.platform.name %}{{ sys.config.platform.name }}, {% endif %}Powered by Providence/Clarity (v{{ sys.version }}{% if sys.build %} {{ sys.build }}){% else %}){% endif %}</title>
+		{% endif %}
+
+		{% endspaceless %}
+		
+		<meta name="X-Platform" value="Providence/Clarity (v{{ sys.version }}{% if sys.build %} {{ sys.build }}){% else %}){% endif %}">
 
 		{% include "__north.html" %}
 				
 		<style>
-			{% include "__universal_style.css" %}{% block style %}{% endblock %}
+			{% include "../__universal_style.css" %}{% block style %}{% endblock %}
 		</style>
 		
 		{% block head %}{% endblock %}
@@ -15,7 +27,18 @@
 	</head>
 	
 	<body{% if page.bgclass %} class="{{ page.bgclass }}"{% endif %}>
-		{% block body %}{% endblock %}
+		
+		<div id="page">
+		
+			<div id='topbar' class="width_100">
+				<h1>Providence/Clarity</h1><div id='utilbar'>{% if sys.security.user %}{{ sys.security.user }}{% if sys.security.permissions.sys_admin %} (Admin){% endif %} | About | Settings | <a href='{{ sys.security.logout_url }}' alt='Log Out'>Log Out</a>{% else %}About | <a href='{{ sys.security.login_url }}' alt='Log In'>Log In</a>{% endif %}</div>
+			</div>
+		
+			<div id="content_wrap">
+				{% block body %}{% endblock %}
+			</div>
+			
+		</div>
 	</body>
 	
 	{% include "__south.html" %}

@@ -1,34 +1,57 @@
-from ProvidenceClarity.handlers import RequestHandler
+from ... import RequestHandler
 
-class ViewerIndex(RequestHandler):
+
+class DataIndex(RequestHandler):
     
-    """ Template: data/viewer_index.html """
+    """ Template:  """
     
     def get(self):
         
-        self.response_raw('<b>coming soon</b>')
-        
-        
-class DataCommit(RequestHandler):
-    
-    """ Simple redirects after data commit. """
-    
-    def post(self):
-        
-        pass
+        self.render_raw('<b>DataIndex</b>')
         
         
 class DataList(RequestHandler):
     
-    """ Template: data/list.html """
+    def get(self):
+        
+        pass
+   
+   
+class DataCreate(RequestHandler):
     
     def get(self):
+        
         pass
         
+    def post(self):
         
-class DataViewer(RequestHandler):
+        pass       
+  
+  
+class DataView(RequestHandler):
     
-    """ Template: data/viewer.html """
+    def get(self, type=False, key=False):
+        
+        self.render_raw('<b>Type: </b>'+str(type)+'<br /><b>Key: </b>'+str(key))
+
+
+class DataEdit(RequestHandler):
     
     def get(self):
+        
+        pass
+
+    def post(self):
+        
+        pass
+
+
+class DataDelete(RequestHandler):
+    
+    def get(self):
+        
+        pass
+        
+    def post(self):
+        
         pass

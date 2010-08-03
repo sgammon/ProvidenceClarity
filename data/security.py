@@ -8,7 +8,6 @@ from ProvidenceClarity.data.core.model import Model
 from ProvidenceClarity.data.core.polymodel import PolyModel
 
 from ProvidenceClarity.api.data import DataManager
-from ProvidenceClarity.api.security import exceptions
 
 
 class SecurityAccount(PolyModel):
@@ -79,64 +78,6 @@ class SecurityKey(PolyModel, CreatedModifiedMixin):
     invalid_tally = db.IntegerProperty(default=0)
     
     last_use = db.DateTimeProperty()
-
-    ## Checks for valid key and increments use
-    def checkValidAndIncrement(self):
-        
-        if self.CheckValid() is True:
-            
-            self.use_tally = self.use_tally+1
-            self.put()
-            
-            return True
-            
-        else:
-            return False
-
-    ## Checks activation and expiration
-    def checkValid(self):
-        
-        try:
-            # check activation
-            if self.activated != True:
-                raise exceptions.KeyNotActivated
-            
-            # check banned
-            if self.banned != False:
-                raise exceptions.KeyBanned(self.banned_reason)
-            
-            # check manual expiration
-            if self.expired != False:
-                raise exceptions.KeyExpired()
-            
-            # check expiry date
-            if self.expiration is not None and datetime.datetime.now() > self.expiration:
-                raise exceptions.KeyExpired()            
-            
-            # check lifetime
-            if self.lifetime is not None:
-                delta = datetime.timedelta(seconds=self.lifetime)
-                if datetime.datetime.now() > self.dateCreated+delta:
-                    raise exceptions.KeyExpired()
-                    
-            # check usage limit
-            if config.get('security','key_invalid_access_limit',True) < self.use_tally:
-                raise exceptions.KeyAccessLimitReached 
-                    
-        except:
-            
-            # Increment error and put
-            self.error_tally = self.error_tally+1
-            self.put()
-            
-            # Re-raise exception and return false
-            raise sys.exc_info()[0]
-            return False
-            
-        else:
-            
-            # Return true if all tests pass
-            return True
         
 
 class GenericKey(SecurityKey):
@@ -200,7 +141,6 @@ class ProtoHelper(DataManager):
         
         
         return self.models
-    
 
     def clean(self):
         

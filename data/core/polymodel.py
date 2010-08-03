@@ -7,18 +7,16 @@ from ProvidenceClarity.data.core.model import Model
 from ProvidenceClarity.data.core.properties.polymodel import _ClassKeyProperty
 from ProvidenceClarity.data.core.properties.polymodel import _ModelPathProperty
 
-try:
-    import pc_config
-except ImportError:
-    pass
+from ProvidenceClarity import pc_config
 
-_PATH_PREFIX = pc_config.get('path_prefix','data',False)
-_IMPORT_PREFIX = pc_config.get('import_prefix','data',False)
+_PATH_PREFIX = pc_config.get('path_prefix','api.data.core.polymodel.PolyModel',False)
+_IMPORT_PREFIX = pc_config.get('import_prefix','api.data.core.polymodel.PolyModel',False)
+_PATH_SEPERATOR = pc_config.get('poly_path_seperator','api.data.core.polymodel.PolyModel',':')
+_LOG_IMPORTS = pc_config.get('log_imports','api.data.core.polymodel.PolyModel',False)
 
-_CLASS_KEY_PROPERTY = '_class_key_'
-_PATH_KEY_PROPERTY  = '_class_path_'
+_CLASS_KEY_PROPERTY = pc_config.get('poly_class_field','data','_class_key_')
+_PATH_KEY_PROPERTY  = pc_config.get('poly_path_field','data','_class_path_')
 
-_PATH_SEPERATOR = ':'
 
 _class_map = {}
 
@@ -200,20 +198,28 @@ class PolyModel(Model):
                 #### build and execute an import statement to lazy-load the implementation class
                 if _IMPORT_PREFIX is not False:
                     if _IMPORT_PATH[-1] != '.': _IMPORT_PATH = _IMPORT_PATH+'.'
-                    class_path_t[0] = str(_IMPORT_PATH)+str(class_path_t[0])
-                __import__(class_path_t[0], globals(), locals(), [class_path_t[1]], -1)    
+                    prefix = _IMPORT_PATH
+                else:
+                    prefix = ''
+
+                if _LOG_IMPORTS == True: logging.debug('[PolyModel]: Importing data class "'+str(class_path_t[-1])+'" from "'+str(prefix.join(class_path_t[0:-1]))+'".')
+                imported_class = __import__(prefix+'.'.join(class_path_t[0:-1]), globals(), locals(), class_path_t[-1], -1)
 
                 #### instantiate an empty class of the requested type
-                obj = eval(class_path_t[1],globals(),locals())()
+                if hasattr(imported_class, class_path_t[-1]):
                     
-                #### add the class to the _class_map... polymodel will do the rest
-                _class_map[obj.class_key()] = obj.__class__
+                    obj = getattr(imported_class,class_path_t[-1])()
+                    
+                    #### add the class to the _class_map... polymodel will do the rest
+                    _class_map[obj.class_key()] = obj.__class__
                 
             except ImportError:
+                logging.error('[PolyModel]: Error importing data class "'+str(class_path_t)+'".')
                 raise db.KindError('Could not import model hierarchy \'%s\'' % str(key))
-                
+            
             except NameError:
-                raise db.KindError('Could not instantiate model implementation of type "'+str(class_path_t[1])+'", even though import succeeded.')
+                logging.error('[PolyModel]: Error instantiating data class "'+str(class_path_t)+'".')
+                raise db.KindError('Could not instantiate model implementation of type \'%s\'' % str(class_path_t[-1]))
     
         if (_CLASS_KEY_PROPERTY in entity and
             tuple(entity[_CLASS_KEY_PROPERTY]) != cls.class_key()):
