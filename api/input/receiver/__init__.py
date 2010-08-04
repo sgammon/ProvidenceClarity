@@ -14,7 +14,7 @@ class ReceiverController(InputAdapter):
         
         path_t = request.path.split('/')
         
-        d = DataReceiver.get_by_key_name('.'.join(path_t[path_t.index('receiver'):len(path_t))]))
+        d = DataReceiver.get_by_key_name('.'.join(path_t[path_t.index('receiver'):len(path_t)]))
         
         if d is not None:
             
@@ -22,7 +22,9 @@ class ReceiverController(InputAdapter):
                 raise exceptions.ReceiverDisabled()
             else:
                 self.model = d
-                if for_use: return d; else return True
+                if for_use:
+                    return d
+                else: return True
         else:
             raise exceptions.ReceiverNotFound()
             
@@ -33,7 +35,7 @@ class ReceiverController(InputAdapter):
         if isinstance(name, list):
             name = '.'.join(name)
             
-        return DataReceiver(key_name=name,data_handler=data_handler,storage_backend=storage_backend,enabled=enable,**kwargs).put()
+        return DataReceiver(key_name=name,data_type=data_type,data_handler=data_handler,storage_backend=storage_backend,enabled=enable,**kwargs).put()
     
     ## Store data after being processed
     @classmethod

@@ -70,3 +70,8 @@ class ProvidenceClarity(object):
     # Log wrapper for exit
     def exit(self, message):
         return self.log(message,'exit')
+        
+        
+## Exception Master
+class PCException(Exception):
+    pass

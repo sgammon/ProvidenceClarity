@@ -3,14 +3,22 @@ from ProvidenceClarity.api.data import DataManager
 from ProvidenceClarity.data.util import CreatedModifiedMixin
 from ProvidenceClarity.data.input import DataInput
 from ProvidenceClarity.data.mapreduce import MapperParam
+from ProvidenceClarity.data.core.model import Model
 from ProvidenceClarity.data.core.polymodel import PolyModel
 
 
-class AnalyzerEngine(PolyModel, CreatedModifiedMixin):
+class AnalyzerEngine(Model, CreatedModifiedMixin):
     
     """ Abstract ancestor class describing a data processing engine that can be used by the Analyzer module. """
     
     handler_path = db.StringProperty()
+    
+    
+class AnalyzerTemplate(Model, CreatedModifiedMixin):
+    
+    """ Represents a template of settings to be used for an analyzer job. """
+    
+    pass
     
 
 class DataJob(PolyModel, CreatedModifiedMixin):

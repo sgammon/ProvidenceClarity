@@ -1,5 +1,14 @@
 ==== Providence/Clarity Changelog ====
 
+
+0.1.5.102 DEV:
+-- added automatic namespacing to PolyModels based on class name, to avoid collisions when key_name is used
+-- added pc_config parameter for polymodel for namespace seperator
+-- created simple favicons for COI and PC, added routing that redirects /favicon.ico to /assets/images/static/favicon.ico
+-- added pseudocode to receiver class and receiver handler to prepare for more code
+-- added db model for analyzer job templates... can be attached to receivers and scrapers so that analyzer jobs can be queued automatically
+
+
 0.1.5.101 DEV:
 -- added class import logging to data.core.polymodel.PolyModel
 -- accidentally deleted a number of project files, recovered them

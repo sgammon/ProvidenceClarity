@@ -31,6 +31,7 @@ config = {
         'log_imports':False,
         'path_prefix': False,
         'import_prefix': False,
+        'key_name_seperator':'//',
     },
     
     'handlers':

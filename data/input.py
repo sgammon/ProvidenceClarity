@@ -20,7 +20,8 @@ class DataReceiver(DataInput, CreatedModifiedMixin):
     """ Represents an endpoint for receiving data sent to P/C. """
     
     data_handler = db.ListProperty(basestring,default=None)
-    discard_after_handler = db.BooleanProperty(default=True)
+    discard_after_handler = db.BooleanProperty(default=None)
+    queue_analysis_job = db.BooleanProperty(default=True)
     
     
 class DataScraper(DataInput, CreatedModifiedMixin): """ Describes a data scraper. Usually runs on a cron. """

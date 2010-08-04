@@ -13,6 +13,7 @@ _PATH_PREFIX = pc_config.get('path_prefix','api.data.core.polymodel.PolyModel',F
 _IMPORT_PREFIX = pc_config.get('import_prefix','api.data.core.polymodel.PolyModel',False)
 _PATH_SEPERATOR = pc_config.get('poly_path_seperator','api.data.core.polymodel.PolyModel',':')
 _LOG_IMPORTS = pc_config.get('log_imports','api.data.core.polymodel.PolyModel',False)
+_KEY_NAME_SEPERATOR = pc_config.get('key_name_seperator','api.data.core.polymodel.PolyModel','//')
 
 _CLASS_KEY_PROPERTY = pc_config.get('poly_class_field','data','_class_key_')
 _PATH_KEY_PROPERTY  = pc_config.get('poly_path_field','data','_class_path_')
@@ -127,11 +128,26 @@ class PolyModel(Model):
     ## stores python package import path
     _model_path_property = _ModelPathProperty(name=_PATH_KEY_PROPERTY,indexed=False)
     
+    
     def __new__(cls, *args, **kwds):
         """ Prevents direct instantiation of PolyModel. """
         if cls is PolyModel:
             raise NotImplementedError() # raise NotImplemented
         return super(PolyModel, cls).__new__(cls, *args, **kwds)
+        
+        
+    def __init__(self, *args, **kwargs):
+        """ Namespaces a given key_name with the kind name prefixed. """
+        if 'key_name' in kwargs:
+            kn_split_t = kwargs['key_name'].split(_KEY_NAME_SEPERATOR)
+            if kn_split_t[0] == self.class_key()[-1]:
+                self._kn_derived = kwargs['key_name']
+            else:
+                self._kn_derived = self.class_key()[-1]+_KEY_NAME_SEPERATOR+kwargs['key_name']
+                kwargs['key_name'] = self._kn_derived
+                
+        super(PolyModel, self).__init__(*args, **kwargs)
+        
 
     @classmethod
     def kind(cls):
@@ -232,12 +248,38 @@ class PolyModel(Model):
             return poly_class.from_entity(entity)
         return super(PolyModel, cls).from_entity(entity)
 
+    
+    @classmethod
+    def get_by_key_name(cls, key_names, parent=None):
+        
+        if isinstance(key_names, str):
+            kn_split_i = key_names.split(_KEY_NAME_SEPERATOR)
+
+            if kn_split_i[0] == cls.class_key()[-1]:
+                kn_derived = key_names
+                
+            else: kn_derived = cls.class_key()[-1]+_KEY_NAME_SEPERATOR+key_names
+
+        elif isinstance(key_names, list):
+
+            kn_derived = []
+            for item in key_names:
+                kn_split_t = item.split(_KEY_NAME_SEPERATOR)
+                if kn_split_i[0] == cls.class_key()[-1]:
+                    kn_derived.append(item)
+                
+                else: kn_derived.append(cls.class_key()[-1]+_KEY_NAME_SEPERATOR+item)
+                
+        return super(PolyModel, cls).get_by_key_name(kn_derived, parent)
+            
+
     @classmethod
     def all(cls, **kwds):
         query = super(PolyModel, cls).all(**kwds)
         if cls != PolyModel:
             query.filter(_CLASS_KEY_PROPERTY + ' =', cls.class_name())
         return query
+
 
     @classmethod
     def gql(cls, query_string, *args, **kwds):

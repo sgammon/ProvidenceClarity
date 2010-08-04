@@ -1,1 +1,9 @@
-Todo pending.
+==== Providence/Clarity Changelog ====
+
+-- add actual code to storage API for easy storage of data to blobstore and webstorage
+-- add parent for receiver extension (data handler) to enforce existence of important methods (process_data)
+-- add facility to return uniform API responses, perhaps a central APIResponseObject?
+-- add facility to decorate functions that need API authentication (@api_method)?
+-- add exception handling (and exceptions) to receiver class
+-- fill out descriptor classes, figure out automatic system to pull descriptors related to a module
+-- make things like analyzer automatically pull related descriptors, inject them into config
