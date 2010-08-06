@@ -11,35 +11,39 @@ do_log = pc_config.get('log_imports','api.data.proto.ProtoController',False)
 class ProtoController(object):
             
     @classmethod
-    def import_helper(cls,name, fromlist=None):
+    def import_helper(cls,name,fromlist=None):
         
-        if do_log: logging.info("[i]: MODULE REQUEST: "+str(name)+' with fromlist: '+str(fromlist))
+        if do_log: logging.info("[i]: Import request: \'"+str(name)+"\' with fromlist \'"+str(fromlist)+"\'.")
         
         try:
             
-            if fromlist == None:
+            if fromlist is not None:
+            
+                _fromlist_i = []
+            
+                if isinstance(fromlist, str):
+                    _fromlist_i[0] = fromlist
+                    
+                elif isinstance(fromlist, list):
+                    _fromlist_i = fromlist
+                    
+                for subitem in fromlist:
+                    submod = __import__(name+'.'+subitem)
+
+            else:
                 mod = __import__(name)
-
-            elif isinstance(fromlist, list):
-                
-                if len(fromlist) == 1:
-                    mod = __import__(name+'.'+fromlist[0])
-                    if do_log: logging.info("[i]: ====== Import Statement: \""+name+'.'+fromlist[0]+'".')
-
-                elif len(fromlist) > 1:
-                    mod = __import__(name+'.'+'.'.join(fromlist))
-                    if do_log: logging.info("[i]: ====== Import Statement: \""+name+'.'+'.'.join(fromlist)+'".')                    
+                if do_log: logging.info("[i]: === Import Statement: \""+name+'".')
 
             components = name.split('.')
             for comp in components[1:]:
                 mod = getattr(mod, comp)
-                if do_log: logging.info("[i]: ========== Traversing "+str(mod)+" for "+str(comp)+'.')
+                if do_log: logging.info("[i]: ====== Traversing "+str(mod)+" for "+str(comp)+'.')
             
-            if do_log: logging.info("[i]: ====== Returning "+str(mod)+'.')
+            if do_log: logging.info("[i]: === Returning "+str(mod)+'.')
             return mod
             
         except ImportError:
-            if do_log: logging.info("[i]: ====== ImportError exception encountered: \""+str(name)+"\" with fromlist: \""+str(fromlist)+"\".")
+            if do_log: logging.info("[i]: === ImportError exception encountered: \""+str(name)+"\".")
             #TODO: Find a way to store errors in the datastore
             return False
             
@@ -92,31 +96,47 @@ class ProtoController(object):
     @classmethod
     def _recursive_action(cls, module, action):
 
+        if module == False:
+            if do_log: logging.info('[i]: Recursive action got False module.')
+            return None
+
+        if do_log: logging.info('[i]: Recursive action on \''+str(module.__name__)+'\'.')
+
         if cls._valid_module(module):
 
             if isinstance(module, basestring):
-                module = cls.import_helper(module)
+                module = cls.import_helper(module,['ProtoController','__protos__'])
 
             ## start with the top-level import
             if hasattr(module, 'ProtoHelper'):
+                
+                if do_log: logging.info('[i]: ==== Found module-level ProtoHelper.')                
                 
                 h = module.ProtoHelper()
                                 
                 if hasattr(h, action):
                     #@TODO: Find out what to do with these results?
                     res = getattr(h, action)()
+                    if do_log: logging.info('[i]: ======= Found requested action, running.')                    
                     
                 else:
-                    pass
-            
+                    if do_log: logging.info('[i]: ======= Could not find requested action.')
+
+    
             ## proceed to submodule processing (use protos pointer if it exists)
             if hasattr(module, '__protos__'):
-                
+
+                if do_log: logging.info('[i]: === Found __protos__ pointer...')
+
                 for proto in getattr(module, '__protos__'):
 
-                    submod_i = cls.import_helper(module.__name__, [proto])
+                    submod_i = cls.import_helper(module.__name__+'.'+proto)
+                    if do_log: logging.info('[i]: ====== Sub-import statement: \''+module.__name__+'.'+proto+'\'.')
 
                     if hasattr(module, proto):
+                        
+                        if do_log: logging.info('[i]: ======= Retrieved valid submodule \''+str(proto)+'\'.')
+                        
                         submod = getattr(module, proto)
 
                         if submod != False:

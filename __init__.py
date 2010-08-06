@@ -43,7 +43,7 @@ def initialize(config='pc_config_default'):
     except ImportError: exit() # @TODO: Implement error/exception here
 
     # === 3: Import Masterclass    
-    from main import *
+    from main import ProvidenceClarity
     
     # === 4: Environment Vars
     software_t = '/'.split(os.environ['SERVER_SOFTWARE'])

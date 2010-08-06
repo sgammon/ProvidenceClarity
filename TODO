@@ -1,4 +1,4 @@
-==== Providence/Clarity Changelog ====
+==== Providence/Clarity Todo ====
 
 -- add actual code to storage API for easy storage of data to blobstore and webstorage
 -- add parent for receiver extension (data handler) to enforce existence of important methods (process_data)
@@ -7,3 +7,28 @@
 -- add exception handling (and exceptions) to receiver class
 -- fill out descriptor classes, figure out automatic system to pull descriptors related to a module
 -- make things like analyzer automatically pull related descriptors, inject them into config
+
+
+DEVELOPMENT ROADMAP:
+
+-- v1.5 DEV:
+	-Prototype that accepts input via working receivers/scrapers, automatically passes through working object
+	and relation analyzers, stores analyzed data, and outputs basic (XHTML/table based) visualizations.
+	-Working schema for descriptors and protos.
+	-Automatic proto-management methods
+	-Automatic input (receiver/scraper) methods
+
+-- v1.6 ALPHA:
+	-Basic working graph visualizer, basic chart generator, hooked up to object CRUD interface.
+	
+-- v1.7 ALPHA:
+	-Working index generator, and index normalizer.
+	-Working cache generator, and cache manager.
+	-Working statistics analyzer.
+	
+-- v2.0 BETA:
+	-Fully-built data API, input API, output API
+	-Application strings moved to Babel
+	-PolyModel-independent data schema that uses normalized, derived entity indexes instead of a single
+	object kind and related entity indexes.
+	-Graph generator that leverages statistics data to place/color/mark entities.

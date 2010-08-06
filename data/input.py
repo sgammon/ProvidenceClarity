@@ -10,7 +10,7 @@ class DataInput(PolyModel, CreatedModifiedMixin):
     
     description = db.TextProperty()
     enabled = db.BooleanProperty(default=True)
-    data_type = db.StringProperty(choices=['xml','json','html','text','rdf','binary'])
+    format = db.StringProperty(choices=['xml','json','html','text','rdf','binary'])
     storage_backend = db.StringProperty(choices=['datastore','blobstore','bigstorage'])
     stub = db.ReferenceProperty(DataStub)
     

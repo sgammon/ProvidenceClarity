@@ -25,13 +25,19 @@ class ReceiverHandler(RequestHandler):
                 if r.data_handler is not None:
 
                     m = import_helper(r.data_handler)
-                    p_data = m.process_data(data) ## @TODO: More error handling
-                
-                    if r.discard_after_handler != True:
-                        d_stub = r.store(p_data) ## @TODO: Fill out store methods
+                    p_data = m.process_data(data)
+                    
+                    if r.storage_backend == 'datastore':
+                        db.put(p_data)
+                    
+                    else:
+                        if r.discard_after_handler != True:
+                            d_stub = ReceiverController.get_stub(p_data,r) ## @TODO: Fill out store methods
+                            stubkey = StubController.store(d_stub)
                 
                 else:
-                    d_stub = r.store(data)
+                    d_stub = ReceiverController.get_stub(data,r)
+                    StubController.store(d_stub)
                 
                 if r.queue_analysis_job == True:
                     
@@ -39,7 +45,8 @@ class ReceiverHandler(RequestHandler):
                         i_template = r.analysis_template
                     else:
                         i_template = None
-                        
+                    
+                    ## todo
                     r = AnalyzerController.addJob(stub=d_stub,source='receiver',template=r.analysis_template)
             
         else:

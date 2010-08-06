@@ -15,6 +15,7 @@ class D(PolyModel, ProtoModel):
     ## parent attachment
     record_parent = db.StringProperty(required=True,indexed=True,verbose_name="Parent Key")
 
+
 class DescriptorModel:
     """ Provides methods and properties for models that are descriptor-enabled. """    
     pass

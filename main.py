@@ -75,3 +75,7 @@ class ProvidenceClarity(object):
 ## Exception Master
 class PCException(Exception):
     pass
+    
+## Master Controller Object
+class PCController(object):
+    pass

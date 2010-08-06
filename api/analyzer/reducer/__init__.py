@@ -1,1 +1,5 @@
-## REDUCER INIT
+from .. import AnalyzerController
+
+
+class ReducerAnalyzer(AnalyzerController):
+    pass

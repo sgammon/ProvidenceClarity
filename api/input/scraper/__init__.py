@@ -1,6 +1,5 @@
-from .. import InputAdapter
+from .. import InputAdapter, InputController
 
 
-class Scraper(InputAdapter):
-    
+class ScraperController(InputAdapter, InputController):
     pass

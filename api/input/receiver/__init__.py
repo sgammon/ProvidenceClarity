@@ -1,10 +1,11 @@
-from .. import InputAdapter
+from .. import InputAdapter, InputController
 
 import exceptions
 from ProvidenceClarity.data.input import DataReceiver
+from ProvidenceClarity.data.core.model import Model
+from ProvidenceClarity.api.storage import StubController
 
-
-class ReceiverController(InputAdapter):
+class ReceiverController(InputAdapter, InputController):
 
     model = None        
 
@@ -28,17 +29,40 @@ class ReceiverController(InputAdapter):
         else:
             raise exceptions.ReceiverNotFound()
             
+    
     ## Create a new receiver
     @classmethod
-    def new(cls, name, data_handler, data_type, storage_backend='blobstore', enable=False, **kwargs):
+    def create(cls, name, data_handler, data_type, storage_backend='blobstore', enable=False, **kwargs):
         
         if isinstance(name, list):
             name = '.'.join(name)
             
-        return DataReceiver(key_name=name,data_type=data_type,data_handler=data_handler,storage_backend=storage_backend,enabled=enable,**kwargs).put()
+        if isinstance(data_handler, object):
+            handler_i = data_module.__module__.split('.')
+            
+        elif isinstance(data_handler, str):
+            handler_i = data_handler
+            
+        return DataReceiver(key_name=name,data_type=data_type,data_handler=handler_i,storage_backend=storage_backend,enabled=enable,**kwargs).put()
+    
     
     ## Store data after being processed
     @classmethod
-    def store(cls, data, receiver):
+    def get_stub(cls, data, receiver):
         
-        pass
+        return StubController.create('receiver',r.storage_backend,r.format)
+        
+
+class ReceiverHandler(object):
+    
+    """ Receiver extensions external to P/C extend this. """
+
+    data = None # Raw Data
+    p_data = None # Processed Data
+
+
+    def process_data(self, data):
+
+        """ Default prototype method returns inputted data. """
+
+        return data

@@ -39,7 +39,7 @@ class P(Model, CreatedModifiedMixin):
     uses_id = db.BooleanProperty(required=True,default=False,indexed=True,verbose_name="Uses key id?")
     created_modified = db.BooleanProperty(required=True,default=False,indexed=True,verbose_name="Created/modified?")
 
-    ## Special Properties
+    ## Key Use Properties
     keyname_use = db.StringProperty(required=False,default="",indexed=False,verbose_name="Key Name Usage")
     keyid_use = db.StringProperty(required=False,default="",indexed=False,verbose_name="Key ID Usage")
     keyparent_use = db.StringProperty(required=False,default="",indexed=False,verbose_name="Key Parent Usage")

@@ -1,5 +1,8 @@
 ==== Providence/Clarity Changelog ====
 
+0.1.5.103 DEV:
+-- 
+
 
 0.1.5.102 DEV:
 -- added automatic namespacing to PolyModels based on class name, to avoid collisions when key_name is used

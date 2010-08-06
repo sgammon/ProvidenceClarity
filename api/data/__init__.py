@@ -2,6 +2,7 @@ __all__ = ['cacher','indexer','proto']
 
 import logging
 from google.appengine.ext import db, blobstore
+from ProvidenceClarity.main import PCController
 
 ## Property class mappings
 class_map = {
@@ -37,7 +38,7 @@ class_map = {
 OTHER_TYPE_FLAG = '_other_'
             
 # Abstract class for data-handling API modules
-class DataController(object):
+class DataController(PCController):
     pass
     
 

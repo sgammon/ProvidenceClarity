@@ -18,7 +18,7 @@ config = {
     
     'api.data.proto.ProtoController':
     {
-        'log_imports':False,
+        'log_imports':True,
     },
     
     'data':

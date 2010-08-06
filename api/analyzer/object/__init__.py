@@ -1,1 +1,5 @@
-## OBJECT INIT
+from .. import AnalyzerController
+
+
+class ObjectAnalyzer(AnalyzerController):
+    pass

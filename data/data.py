@@ -4,6 +4,9 @@ from ProvidenceClarity.data.util import CreatedModifiedMixin
 from ProvidenceClarity.data.core.polymodel import PolyModel
 
 
+FORMAT_LIST = ['json','xml','text','blob','other']
+ORIGIN_LIST = ['input','analyzer','cache','other']
+
 class DataEntry(PolyModel, CreatedModifiedMixin): """ Describes an entry in a feed of data to be consumed by the system. """
 
 
@@ -11,9 +14,10 @@ class DataStub(PolyModel, CreatedModifiedMixin):
     
     """ Describes a piece of data stored externally from the GAE datastore. """
     
-    format = db.StringProperty(choices=['json','xml','text','blob'])
+    format = db.StringProperty(choices=FORMAT_LIST)
+    format_other = db.StringProperty()
     
-    origin = db.StringProperty(choices=['input','analyzer','cache','other'])
+    origin = db.StringProperty(choices=ORIGIN_LIST)
     origin_other = db.StringProperty()
     
     ## Expiration
@@ -25,14 +29,14 @@ class BlobstoreData(DataStub):
     
     BACKEND = 'blobstore'
     
-    data = blobstore.BlobReferenceProperty()
+    data_ref = blobstore.BlobReferenceProperty()
     
     
 class WebStorageData(DataStub):
     
     BACKEND = 'webstorage'
     
-    url = db.LinkProperty()
+    data_ref = db.LinkProperty()
 
 
 class StoredImage(DataStub):

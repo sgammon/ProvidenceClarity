@@ -4,9 +4,9 @@ from . import StorageBackend
 class WebStorageBackend(StorageBackend):
     
     @classmethod
-    def store_data(cls, key, data):
+    def store(cls, key, data):
         pass
     
     @classmethod
-    def get_data(cls, key):
+    def get(cls, key):
         pass

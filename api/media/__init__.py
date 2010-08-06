@@ -1,5 +1,5 @@
 from ProvidenceClarity.main import PCController
 
 
-class DevController(PCController):
+class MediaController(PCController):
     pass
