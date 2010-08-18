@@ -1,5 +1,3 @@
-from blobstore import BlobstoreBackend
-from webstorage import WebStorageBackend
 from ProvidenceClarity.data.data import ORIGIN_LIST, FORMAT_LIST, DataStub, BlobstoreData, WebStorageData
 
 class StorageBackend(object):
@@ -19,6 +17,9 @@ class StubController(object):
     
     @classmethod
     def create(cls, origin, backend, format, **kwargs):
+        
+        from blobstore import BlobstoreBackend
+        from webstorage import WebStorageBackend
 
         if backend == 'blobstore':
             d = BlobstoreData(**kwargs)
@@ -45,6 +46,9 @@ class StubController(object):
     
     @classmethod
     def store(self, stub, data=None):
+        
+        from blobstore import BlobstoreBackend
+        from webstorage import WebStorageBackend
         
         if isinstance(stub, BlobstoreData):
             stub.data_ref = BlobstoreBackend.store(stub, data)

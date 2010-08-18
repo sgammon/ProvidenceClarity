@@ -74,7 +74,12 @@ class ProvidenceClarity(object):
         
 ## Exception Master
 class PCException(Exception):
-    pass
+
+    message = None
+
+    def __init__(self, msg=None):
+        self.message = msg
+        
     
 ## Master Controller Object
 class PCController(object):

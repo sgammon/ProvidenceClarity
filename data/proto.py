@@ -67,41 +67,6 @@ class P(Model, CreatedModifiedMixin):
                 kwargs['name'] = [self._class.__name__]
             
         super(P, self).__init__(*args, **kwargs)
-    
-    
-class ProtoModel:
-    """ Provides methods and properties for models that are proto-enabled. """
-
-    # grabbed protomodel
-    __proto = None
-
-    @classmethod
-    def getProto(cls):
-        global proto_list
-        
-        # check class first
-        if cls.__proto is not None:
-            return cls.__proto
-        
-        # check cache first
-        if cls.__name__ in proto_list:
-            cls.__proto = proto_list[cls.__name__]
-            return proto_list[cls.__name__]
-        else:
-            proto_list[cls.__name__] = P.get_by_key_name(cls.__name__)
-            cls.__proto = proto_list[cls.__name__]
-
-        return cls.__proto
-        
-    @classmethod
-    def getProtoFields(cls):
-        proto = cls.getProto()
-        if (len(proto.fields) > 0) and (len(proto.field_types) > 0):
-            dat = {}
-            for item in range(0,len(proto.fields)-1):
-                dat[proto.fields[item]] = proto.field_types[item]
-            return dat
-        return None
         
         
 ## Proto Inserts

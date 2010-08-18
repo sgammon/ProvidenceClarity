@@ -7,6 +7,7 @@ from ProvidenceClarity import pc_config
 _PATH_PREFIX = pc_config.get('path_prefix','data',False)
 _IMPORT_PREFIX = pc_config.get('import_prefix','data',False)
 
+
 ## +=+=+ Stores the Python package import path from the application root, for lazy-load on search.
 class _ModelPathProperty(db.StringProperty):
     
@@ -19,7 +20,7 @@ class _ModelPathProperty(db.StringProperty):
     def __get__(self, model_instance, model_class):
         if model_instance is None: return self
         # @TODO: make seperator customizable from some import/config
-        return ':'.join([i for i in str(model_instance.__module__+'.'+model_instance.__class__.__name__).split('.')])
+        return model_instance._getModelPath(':')
 
 ## +=+=+ Stores the polymodel class inheritance path.
 class _ClassKeyProperty(db.ListProperty):
@@ -32,4 +33,4 @@ class _ClassKeyProperty(db.ListProperty):
 
     def __get__(self, model_instance, model_class):
         if model_instance is None: return self
-        return [cls.__name__ for cls in model_class.__class_hierarchy__]
+        return model_instance._getClassPath()

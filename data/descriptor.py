@@ -1,7 +1,7 @@
 from google.appengine.ext import db
 from ProvidenceClarity.api.data import DataManager
 from ProvidenceClarity.data.core.polymodel import PolyModel
-from ProvidenceClarity.data.proto import ProtoModel
+from ProvidenceClarity.api.data.proto import ProtoModel
 
 ##### ### Master Descriptor Classes ### #####
 

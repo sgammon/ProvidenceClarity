@@ -46,6 +46,9 @@ ROUTES = [
     (rp+'/worker/analyzer/mapreduce',analyzer.MapReduceAnalyzer),
     
     ## Data Queue Workers
+    (rp+'/worker/data/transaction',data.TransactionWorker),
+    (rp+'/worker/data/indexer',data.IndexWorker),
+    (rp+'/worker/data/cacher',data.CacheWorker),
     (rp+'/worker/data/hygiene',data.HygieneWorker),
     (rp+'/worker/data/expiration',data.ExpirationWorker),
     (rp+'/worker/data/scheduler',data.SchedulerWorker),

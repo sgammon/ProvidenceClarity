@@ -21,17 +21,21 @@ config = {
         'log_imports':True,
     },
     
-    'data':
+    'data.entity.E':
     {
-        'index_on_put': True,
+        'index_on_create':True,
+        'cache_on_create':False
     },
     
     'data.core.polymodel.PolyModel':
     {
-        'log_imports':False,
-        'path_prefix': False,
-        'import_prefix': False,
+        'log_imports':True,
         'key_name_seperator':'//',
+    },
+    
+    'decorators.data.QueuedTransaction':
+    {
+        'default_retries':3,
     },
     
     'handlers':
@@ -46,7 +50,7 @@ config = {
     'security':
     {
         'enable_security':False,
-    }
+    },
 
 }
 

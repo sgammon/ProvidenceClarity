@@ -1,11 +1,64 @@
 from ProvidenceClarity.api.data import DataManager
 from google.appengine.ext import blobstore, db
+from ProvidenceClarity import pc_config
 from ProvidenceClarity.data.util import CreatedModifiedMixin
+from ProvidenceClarity.data.core.model import Model
 from ProvidenceClarity.data.core.polymodel import PolyModel
+from ProvidenceClarity.data.core.properties import util
 
 
 FORMAT_LIST = ['json','xml','text','blob','other']
 ORIGIN_LIST = ['input','analyzer','cache','other']
+
+_CACHE_ENTITIES_ON_CREATE = pc_config.get('cache_on_create','data.entity.E',False)
+_INDEX_ENTITIES_ON_CREATE = pc_config.get('cache_on_create','data.entity.E',True)
+
+
+class TaskQueue(Model):
+    name = db.StringProperty()
+    status = db.StringProperty(choices=['activated','paused'])
+
+
+class QueuedTask(PolyModel, CreatedModifiedMixin):
+    queue = db.ReferenceProperty(TaskQueue, collection_name='tasks')
+    status = db.StringProperty(choices=['processing','queued','standby','complete'],default='queued')
+    eta = db.DateTimeProperty(default=None, indexed=False)
+    work_start = db.DateTimeProperty(indexed=False)
+    work_end = db.DateTimeProperty(indexed=False)
+    chain_length = db.IntegerProperty(indexed=False)
+    success = db.BooleanProperty(default=False)
+    next_task = db.SelfReferenceProperty(collection_name='previous_task')
+    
+    
+class QueuedTransaction(QueuedTask):
+    retries = db.IntegerProperty()
+    
+
+class WriteOperation(QueuedTransaction):
+    subject = util.CachedProtobuf()
+    #attachments = util.CachedProtobufList() #@TODO: Find out why this is always marked 'required'
+    
+    
+class DeleteOperation(QueuedTransaction):
+    subject  = db.ListProperty(db.Key)
+    scrub_decorators = db.BooleanProperty(default=True)
+    scrub_indexes = db.BooleanProperty(default=True)
+    scrub_cache = db.BooleanProperty(default=True)
+    scrub_children = db.BooleanProperty(default=True)
+    
+
+class EntityCreateTask(WriteOperation):
+    queue_indexing = db.BooleanProperty(default=_INDEX_ENTITIES_ON_CREATE)
+    queue_caching = db.BooleanProperty(default=_CACHE_ENTITIES_ON_CREATE)
+    
+    
+class EntityUpdateTask(WriteOperation):
+    pass
+    
+
+class EntityDeleteTask(DeleteOperation):
+    pass
+
 
 class DataEntry(PolyModel, CreatedModifiedMixin): """ Describes an entry in a feed of data to be consumed by the system. """
 

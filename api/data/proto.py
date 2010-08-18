@@ -173,3 +173,7 @@ class ProtoController(object):
             
         else:
             return cls._recursive_action(module, 'do_clean')
+            
+            
+class ProtoModel(object):
+    pass

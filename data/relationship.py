@@ -1,8 +1,8 @@
 from ProvidenceClarity.api.data import DataManager
 from ProvidenceClarity.data.core.polymodel import PolyModel
 from ProvidenceClarity.data.core.properties import util, reference
-from ProvidenceClarity.data.proto import ProtoModel
-from ProvidenceClarity.data.descriptor import DescriptorModel
+from ProvidenceClarity.data.descriptor import DescriptorModel ## @TODO: move this to descriptor api under data
+from ProvidenceClarity.api.data.proto import ProtoModel
 
 class R(PolyModel, ProtoModel, DescriptorModel):
     

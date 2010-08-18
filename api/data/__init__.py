@@ -3,6 +3,11 @@ __all__ = ['cacher','indexer','proto']
 import logging
 from google.appengine.ext import db, blobstore
 from ProvidenceClarity.main import PCController
+from ProvidenceClarity.api.data import exceptions
+from ProvidenceClarity.api.util import import_helper
+from ProvidenceClarity.data.core.natural import NaturalKind
+
+from ProvidenceClarity.data.core.properties.polymodel import _ClassKeyProperty, _ModelPathProperty
 
 ## Property class mappings
 class_map = {
@@ -39,8 +44,79 @@ OTHER_TYPE_FLAG = '_other_'
             
 # Abstract class for data-handling API modules
 class DataController(PCController):
-    pass
-    
+
+    @classmethod
+    def import_model(cls, classpath):
+
+        imported_class = import_helper('.'.join(classpath[0:-1]),classpath[-1])
+        return imported_class
+        
+        
+    @classmethod
+    def generateNaturalKind(cls, entity, softfail=False, **kwargs):
+        
+        from ProvidenceClarity.data.entity import E
+        
+        ## only accepts polymodel instances
+        if hasattr(entity, '_PC_MODEL_BRANCH'):
+            if getattr(entity, '_PC_MODEL_BRANCH') == '_POLY_':
+                if entity.class_key()[-1] == 'E':
+                    if softfail is True:
+                        return (entity, None)
+                    else:
+                        raise exceptions.InvalidPolyInput('Cannot convert root E to a natural kind.') ## @TODO: String localization
+                else:
+                    pass
+            else:
+                if softfail is True:
+                    return (entity, None)
+                else:
+                    raise exceptions.InvalidPolyInput('Invalid PC model branch.')
+        
+        k = entity.key()
+        
+        if isinstance(k.id_or_name(), str): ## if it has a keyname, namespace and honor it
+            _e_key = db.Key.from_path('E', entity._getNamespacedKeyName(k.name()))
+            _n_key = db.Key_from_path(entity.class_key()[-1], k.name())
+        else:
+            _e_key = db.allocate_ids('E', 1)
+            _n_key = db.Key_from_path(entity.class_key()[-1], 1)
+                
+        if k.id() is None:
+            if 'key_name' not in kwargs:
+                kwargs['key_name'] = k.name()
+                
+        n_prop = {}
+        e_prop = entity.properties()
+        for item in e_prop:
+
+            if e_prop[item].__class__ in [_ClassKeyProperty, _ModelPathProperty]:
+                pass ## ignore classkey and modelpath properties
+
+            elif e_prop[item].__class__ == db.ReferenceProperty:
+                e_prop[item] = db.ReferenceProperty(collection_name=item+'_n')
+            
+            else:
+                n_prop[item] = e_prop[item]
+
+        ## create and instantiate model class
+        ClassObj = type(entity.class_key()[-1], (NaturalKind,), n_prop)
+
+        if k.parent() is not None:
+            natural_kind_record = ClassObj(parent, key=_n_id, **kwargs)
+        else:
+            natural_kind_record = ClassObj(**kwargs)            
+            
+        t_entity = E(key=_e_key) ## create trimmed entity
+        
+        for prop in n_prop:
+            setattr(natural_kind_record, prop, getattr(entity, prop))
+
+            if prop in entity._entityIndexedProperties():
+               setattr(t_entity, prop, getattr(entity, prop)) ## move indexed properties over to new Entity
+        
+        return t_entity, natural_kind_record
+
 
 # Utility class for proto and dev structure
 class DataManager(object):
