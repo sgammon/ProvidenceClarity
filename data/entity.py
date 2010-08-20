@@ -3,6 +3,7 @@ from google.appengine.api import datastore
 
 from ProvidenceClarity.api.data import DataManager
 from ProvidenceClarity.api.data.proto import ProtoModel
+from ProvidenceClarity.data.core.expando import Expando
 from ProvidenceClarity.data.core.polymodel import PolyModel
 from ProvidenceClarity.data.core.properties import util
 from ProvidenceClarity.data.util import CreatedModifiedMixin
@@ -53,6 +54,13 @@ class E(PolyModel, ProtoModel, CreatedModifiedMixin):
     def delete(self, **kwargs):
         return False
     
+
+class NE(Expando):
+
+    """ A reduced-down expando meant for temporary storage as a CachedProtobuf. """
+    
+    data_class_path = db.StringProperty(name='_data_class_path',indexed=True)
+
 
 ## Proto Inserts
 

@@ -48,7 +48,20 @@ class DataController(PCController):
     @classmethod
     def import_model(cls, classpath):
 
-        imported_class = import_helper('.'.join(classpath[0:-1]),classpath[-1])
+        logging.info('===== Import Model Request =====')
+
+        if isinstance(classpath, list):
+            logging.info('Classpath is list: '+'.'.join(classpath[0:-1])+' with endpoint '+classpath[-1])
+            imported_class = import_helper('.'.join(classpath[0:-1]),classpath[-1])
+        
+        elif isinstance(classpath, (str, unicode)):
+            logging.info('Classpath is string: '+classpath)
+            imported_class = import_helper(classpath)
+            
+        else:
+            logging.critical('Classpath is neither list nor str but actually '+str(type(classpath))+'.')
+            return False
+        
         return imported_class
         
         
@@ -77,14 +90,16 @@ class DataController(PCController):
         
         if isinstance(k.id_or_name(), str): ## if it has a keyname, namespace and honor it
             _e_key = db.Key.from_path('E', entity._getNamespacedKeyName(k.name()))
-            _n_key = db.Key_from_path(entity.class_key()[-1], k.name())
+            _n_key = db.Key.from_path(entity.class_key()[-1], k.name())
         else:
-            _e_key = db.allocate_ids('E', 1)
-            _n_key = db.Key_from_path(entity.class_key()[-1], 1)
+            start, end = db.allocate_ids(db.Key.from_path('E',1), 1)
+            _e_key = db.Key.from_path('E',start)
+            
+            start, end = db.allocate_ids(db.Key.from_path(entity.class_key()[-1], 1), 1)
+            _n_key = db.Key.from_path(entity.class_key()[-1], start, parent=_e_key)
                 
-        if k.id() is None:
-            if 'key_name' not in kwargs:
-                kwargs['key_name'] = k.name()
+        if 'key_name' in kwargs:
+            del kwargs['key_name']
                 
         n_prop = {}
         e_prop = entity.properties()
@@ -102,11 +117,7 @@ class DataController(PCController):
         ## create and instantiate model class
         ClassObj = type(entity.class_key()[-1], (NaturalKind,), n_prop)
 
-        if k.parent() is not None:
-            natural_kind_record = ClassObj(parent, key=_n_id, **kwargs)
-        else:
-            natural_kind_record = ClassObj(**kwargs)            
-            
+        natural_kind_record = ClassObj(key=_n_key, **kwargs)
         t_entity = E(key=_e_key) ## create trimmed entity
         
         for prop in n_prop:

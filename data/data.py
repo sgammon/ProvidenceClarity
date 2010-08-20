@@ -31,7 +31,7 @@ class QueuedTask(PolyModel, CreatedModifiedMixin):
     
     
 class QueuedTransaction(QueuedTask):
-    retries = db.IntegerProperty()
+    retries = db.IntegerProperty(default=3)
     
 
 class WriteOperation(QueuedTransaction):
@@ -111,6 +111,10 @@ class ProtoHelper(DataManager):
 
     def insert(self):
         
+        self.models.append(self.P(_class=NormalizedObject,
+                                    direct_parent=None,ancestry_path=[],abstract=False,derived=True,is_data=False,poly_model=False,uses_expando=True,uses_parent=False,uses_id=False,
+                                   created_modified=False,keyname_use=None,keyid_use=None,keyparent_use=None))
+        
         self.models.append(self.P(_class=DataEntry,
                                     direct_parent=None,ancestry_path=[],abstract=False,derived=True,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
@@ -136,6 +140,7 @@ class ProtoHelper(DataManager):
 
     def clean(self):
         
+        self.models.append(self.P.get_by_key_name('NormalizedObject'))
         self.models.append(self.P.get_by_key_name('DataEntry'))
         self.models.append(self.P.get_by_key_name('DataStub'))
         self.models.append(self.P.get_by_key_name('BlobstoreData'))

@@ -1,6 +1,7 @@
 from google.appengine.ext import db
 from ProvidenceClarity.api.data import DataManager
 from ProvidenceClarity.data.core.model import Model
+from ProvidenceClarity.data.core.expando import Expando
 from ProvidenceClarity.data.core.polymodel import PolyModel
 from ProvidenceClarity.data.util import CreatedModifiedMixin
 
@@ -24,6 +25,13 @@ class CachedItem(db.Expando):
     """ An item in a cache. """
     
     cache = db.ReferenceProperty(C, collection_name="items")
+
+
+class NormalizedObject(Expando):
+    data_class_path = db.StringProperty(name='_data_class_path')
+    
+    def put(self):
+        raise NotImplementedError('NormalizedObject is meant for entity storage and is not allowed to be stored.')
     
 
 ## Proto Inserts

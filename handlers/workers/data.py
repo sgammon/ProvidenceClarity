@@ -22,8 +22,15 @@ class TransactionWorker(RequestHandler):
         if self.request.get('_tx_ticket', default_value=None) is not None:
             
             mode = self.request.get('_tx_worker', default_value='QueuedTransaction')
-            worker = getattr(data, mode)
+            worker = getattr(data, self.request.get('_tx_worker', default_value='EntityCreateTask'))
+            
+            logging.info('_tx_ticket: '+str(self.request.get('_tx_ticket')))
+            
             ticket = worker.get_by_key_name(self.request.get('_tx_ticket'))
+            if isinstance(ticket, list):
+                ticket = ticket[0]
+
+            logging.info('ticket key: '+str(self.request.get('_tx_ticket')))
 
             logging.info('Retrieved ticket. '+str(ticket))
 
@@ -80,9 +87,9 @@ class TransactionWorker(RequestHandler):
 
                             ## @TODO: figure out way to merge descriptors in and put them too
                             
-                            if ticket.descriptors is not None:
-                                for item in ticket.descriptors:
-                                    pass
+                            #if ticket.attachments is not None:
+                            #    for item in ticket.attachments:
+                            #        pass
                                     
                             logging.info('Putting commit list...')
 
@@ -112,15 +119,16 @@ class TransactionWorker(RequestHandler):
                         self.response.set_status(404)
                         self.render_raw('404 Fail: Invalid Mode')
                         
-                        
-                    db.run_in_transaction_custom_retries(ticket.retries, txn, ticket)
+                    logging.info('Ticket dump: '+str(ticket))
+                    logging.info('Ticket properties: '+str(ticket.properties()))
+                    db.run_in_transaction_custom_retries(3, txn, ticket)
                     logging.info('Transaction complete.')
                 
-                except:
-                    ## @TODO: error handling
-                    logging.critical('Error 500 during transaction processing.')
-                    self.response.set_status(500)
-                    self.render_raw('<b>500 Error:</b> shit failed and blew up no idea why')
+                #except:
+                #   ## @TODO: error handling
+                #    logging.critical('Error 500 during transaction processing.')
+                #    self.response.set_status(500)
+                #    self.render_raw('<b>500 Error:</b> shit failed and blew up no idea why')
 
                 finally:
                     ## @TODO: update ticket

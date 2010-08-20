@@ -252,93 +252,82 @@ class PolyModel(Model):
         if _class_map[cls.class_key()] is not None:
             return _class_map[cls.class_key()]
         else: return cls
+        
+        
+    @classmethod
+    def get_by_key_name(cls, key_names, parent=None):
 
-    
+        logging.info('get by key name request: '+str(key_names))
+        
+        _d_key_names = []
+        if len(cls.class_key()) > 1:
+            
+            logging.info('key needs namespacing. class key: '+str(cls.class_key()))
+            logging.info('key names is of type: '+str(type(key_names)))
+            
+            if isinstance(key_names, (str, unicode)):
+                
+                logging.info('key names is a string.')
+                
+                _d_key_names = cls.class_key()[-1]+'//'+key_names
+                
+                logging.info('result of string processing: '+str(_d_key_names))
+            
+            elif isinstance(key_names, list):
+                
+                logging.info('key names is a list.')
+                
+                for entry in key_names:
+                    
+                    new = cls.class_key()[-1]+'//'+str(entry)
+                    
+                    _d_key_names.append(new)
+
+                    logging.info('for entry '+str(entry)+' in key_names, result is '+str(new))
+                
+        else:
+            _d_key_names = key_names
+            
+        logging.info('result of processing: '+str(_d_key_names))
+            
+        res = super(PolyModel, cls).get_by_key_name(_d_key_names)
+            
+        logging.info('result of rpc: '+str(res))
+            
+        return res
+
+
     @classmethod
     def from_entity(cls, entity):
-    
-        ## @TODO: Clear logging messages here
-        logging.info(' ')
-        logging.info('========== POLYMODEL ENTITY BLACK MAGIC (FUCK YEAH) ==========')
-        logging.info('cls: '+str(cls))
-        logging.info('entity: '+str(entity))
-        logging.info('class_key: '+str(entity[_CLASS_KEY_PROPERTY]))
-        logging.info('path_key: '+str(entity[_PATH_KEY_PROPERTY]))
-    
-        if(_PATH_KEY_PROPERTY in entity and
-           entity[_PATH_KEY_PROPERTY] != cls.path_key()):
-            key = entity[_PATH_KEY_PROPERTY]
-            
-            if _CLASS_KEY_PROPERTY in entity:
-                if entity[_CLASS_KEY_PROPERTY] is not None and isinstance(entity[_CLASS_KEY_PROPERTY], list):
-                    if tuple(entity[_CLASS_KEY_PROPERTY]) in _class_map:
-                        logging.info('Found in classmap! Returning '+str(_class_map[tuple(entity[_CLASS_KEY_PROPERTY])]))
-                        logging.info(' ')
-                        return _class_map[tuple(entity[_CLASS_KEY_PROPERTY])]
-            
-            try:
-                
-                ### split away path from class name
-                class_path_t = key.split(_PATH_SEPERATOR)
-                
-                logging.info('Class Path T: '+str(class_path_t))
-                
-                if _LOG_IMPORTS == True: logging.debug('[PolyModel]: Importing data class "'+str(class_path_t[-1])+'" from "'+str('.'.join(class_path_t[0:-1]))+'".')
-                imported_class = DataController.import_model(class_path_t)
-                
-                logging.info('Imported Class: '+str(imported_class))
 
-#                if hasattr(imported_class, class_path_t[-1]):
+        if(_PATH_KEY_PROPERTY in entity and
+           tuple(entity[_PATH_KEY_PROPERTY]) != cls.path_key()):
+            key = entity[_PATH_KEY_PROPERTY].split(':')
+            try:
+                abspath = os.path.abspath(os.path.dirname(__file__))
+                if abspath not in sys.path:
+                    sys.path.insert(0,abspath)
                     
-                logging.info('Attribute Request: '+str(class_path_t[-1])+' from class '+str(imported_class))
+                    imported_class = DataController.import_model(key)
+                    obj = imported_class()
                     
-                #obj = getattr(imported_class,class_path_t[-1])()
-                obj = imported_class()
+                    _class_map[obj.class_key()] = obj.__class__
                     
-                logging.info('Instantiation result: '+str(obj))
-                    
-                #### add the class to the _class_map... polymodel will do the rest
-                _class_map[obj.class_key()] = obj.__class__
-                    
-                logging.info('Adding '+str(obj.__class__)+' to classmap with key '+str(obj.class_key()))
-                
+                    return obj.from_entity(entity)
+
             except ImportError:
-                logging.error('[PolyModel]: Error importing data class "'+str(class_path_t)+'".')
-                logging.critical('CRITICAL: Could not import data class at requested '+str(class_path_t)+'.')
-                logging.critical(' ')
                 raise db.KindError('Could not import model hierarchy \'%s\'' % str(key))
-            
-            except NameError:
-                logging.error('[PolyModel]: Error instantiating data class "'+str(class_path_t)+'".')
-                logging.critical('CRITICAL: No implementation found in classmap for key '+str(key)+'. Terminating.')
-                logging.critical(' ')
-                raise db.KindError('Could not instantiate model implementation of type \'%s\'' % str(class_path_t[-1]))
-    
+
         if (_CLASS_KEY_PROPERTY in entity and
             tuple(entity[_CLASS_KEY_PROPERTY]) != cls.class_key()):
             key = tuple(entity[_CLASS_KEY_PROPERTY])
             try:
-                
-                ### this should not fail, as long as the import statement above succeeds
                 poly_class = _class_map[key]
-                logging.info('Resulting polyclass: '+str(poly_class))
-                
             except KeyError:
-                
-                logging.critical('CRITICAL: No implementation found in classmap for key '+str(key)+'. Terminating.')
-                logging.critical(' ')
-                
                 raise db.KindError('No implementation for class \'%s\'' % key)
-                
-            r = poly_class.from_entity(entity)
-            logging.info('Resulting R1 polymodel: '+str(r)+'. Success.')
-            logging.info(' ')
-            return r
+            return poly_class.from_entity(entity)
+        return super(PolyModel, cls).from_entity(entity)
         
-        r = super(PolyModel, cls).from_entity(entity)
-        logging.info('Resulting R2 polymodel super: '+str(r)+'. Success.')
-        logging.info(' ')
-        return r
 
     @classmethod
     def class_key_as_list(cls):
@@ -348,52 +337,6 @@ class PolyModel(Model):
         if not hasattr(cls, '__class_hierarchy__'):
             raise NotImplementedError('Cannot determine class key without class hierarchy')
         return list(cls.class_name() for cls in cls.__class_hierarchy__)
-    
-    
-    @classmethod
-    def get_by_key_name(cls, key_names, parent=None, **kwargs):
-
-        logging.info('GET_BY_KEY_NAME REQUEST RECEIVED!')
-        logging.info('Class: '+str(cls))
-        logging.info('ClassKey: '+str(cls.class_key()))
-        logging.info('KeyName: '+str(key_names))
-        logging.info('Parent: '+str(parent))
-
-        _d_key_names = []        
-        if isinstance(key_names, (str, unicode)):
-            if len(cls.class_key()) > 1:
-                prefix = cls.class_key()[-1]
-                _d_key_names = prefix+_KEY_NAME_SEPERATOR+key_names
-            else:
-                _d_key_names = key_names
-        
-        elif isinstance(key_names, list):
-            if len(cls.class_key()) > 1:
-
-                prefix = cls.class_key()[-1]
-        
-                for key_name in key_names:
-                    _d_key_names.append(prefix+_KEY_NAME_SEPERATOR+key_name)
-                            
-        logging.info('Derived: '+str(_d_key_names))
-
-        try:
-            parent = db._coerce_to_key(parent)
-        except db.BadKeyError, e:
-            raise db.BadArgumentError(str(e))
-
-        rpc = datastore.GetRpcFromKwargs(kwargs)
-        key_names, multiple = datastore.NormalizeAndTypeCheck(key_names, basestring)
-        keys = [datastore.Key.from_path(cls.kind(), name, parent=parent) for name in key_names]
-
-        if multiple:
-            result = db.get(keys, rpc=rpc)
-            logging.info('Returning '+str(result))
-            return result
-        else:
-            result = db.get(keys[0], rpc=rpc)
-            logging.info('Returning '+str(result))
-            return result
                         
 
     @classmethod

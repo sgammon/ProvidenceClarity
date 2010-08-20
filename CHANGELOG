@@ -1,7 +1,14 @@
 ==== Providence/Clarity Changelog ====
 
 0.1.5.103 DEV:
--- 
+-- fixed automatic key_name namespacing problems when retrieving from db
+-- added transaction queue, which executes arbitrary transactions like creating/deleting entities
+-- added entityCreate mode for transaction queue
+-- added @QueuedTransaction decorator and replaced put() method on E
+-- rewrote polymodel lazy-loading functionality
+-- created to/from protobuf helpers in the CacheController
+-- created and perfected CachedProtobuf and CachedProtobufList properties
+-- created database models QueuedTask, QueuedTransaction, and others in data.data
 
 
 0.1.5.102 DEV:
