@@ -4,6 +4,7 @@ from ProvidenceClarity.data.util import CreatedModifiedMixin
 from ProvidenceClarity.data.input import DataInput
 from ProvidenceClarity.data.mapreduce import MapperParam
 from ProvidenceClarity.data.core.model import Model
+from ProvidenceClarity.data.core.expando import Expando
 from ProvidenceClarity.data.core.polymodel import PolyModel
 
 
@@ -57,7 +58,7 @@ class MapReduceJob(DataJob):
     mapper = db.StringProperty()
     
     
-class MapReduceJobParam(db.Expando):
+class MapReduceJobParam(Expando):
     
     """ Maps a param to a value for a map reduce job. """
     
@@ -83,7 +84,7 @@ class ProtoHelper(DataManager):
                              created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
                              
         self.models.append(self.P(_class=MapReduceJob,
-                                    direct_parent=db.Key.from_path('Proto','DataJob'),ancestry_path=['DataJob'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
+                                    direct_parent=db.Key.from_path('P','DataJob'),ancestry_path=['DataJob'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
                                    
         self.models.append(self.P(_class=MapReduceJobParam,
@@ -91,7 +92,7 @@ class ProtoHelper(DataManager):
                                    created_modified=True,keyname_use='Name for param.',keyid_use=None,keyparent_use='Job that owns param and value.'))
                                    
         self.models.append(self.P(_class=DirectStorageJob,
-                                    direct_parent=db.Key.from_path('Proto','DataJob'),ancestry_path=['DataJob'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
+                                    direct_parent=db.Key.from_path('P','DataJob'),ancestry_path=['DataJob'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
         
         return self.models

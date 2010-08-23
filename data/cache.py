@@ -28,6 +28,9 @@ class CachedItem(db.Expando):
 
 
 class NormalizedObject(Expando):
+    
+    """ An object not meant to be stored, but compressed to a Protobuf. A midway model used in between encoding and decoding. """
+    
     data_class_path = db.StringProperty(name='_data_class_path')
     
     def put(self):
@@ -44,9 +47,9 @@ class ProtoHelper(DataManager):
                                     direct_parent=None,ancestry_path=[],abstract=True,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
                                    
-        self.models.append(self.P(_class=NC,name=['NormalizedCache'],
-                                    direct_parent=None,ancestry_path=[],abstract=True,derived=False,is_data=False,poly_model=False,uses_keyname=False,uses_parent=False,uses_id=False,
-                                   created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
+        self.models.append(self.P(_class=NormalizedObject,
+                                    direct_parent=None,ancestry_path=[],abstract=True,derived=True,is_data=False,poly_model=False,expando=True,uses_keyname=True,uses_parent=True,uses_id=True,
+                                   created_modified=False,keyname_use='Adopts key name of encoded object.',keyid_use='Adopts ID of encoded object.',keyparent_use='Adopts parent of encoded object.'))
         
         self.models.append(self.P(_class=CachedItem,
                                     direct_parent=None,ancestry_path=[],abstract=False,derived=True,is_data=False,poly_model=False,expando=True,uses_keyname=True,uses_parent=True,uses_id=False,

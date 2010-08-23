@@ -72,32 +72,32 @@ class ProtoHelper(DataManager):
 
     def insert(self):
 
-        self.models.append(self.P(_class=D,name=['Descriptor'],
+        self.models.append(self.P(_class=D,
                                     direct_parent=None,ancestry_path=[],abstract=True,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
                                    
         self.models.append(self.P(_class=IndexingDescriptor,
-                                    direct_parent=db.Key.from_path('Proto','D'),ancestry_path=['D'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
+                                    direct_parent=db.Key.from_path('P','D'),ancestry_path=['D'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
                                    
         self.models.append(self.P(_class=CachingDescriptor,
-                                    direct_parent=db.Key.from_path('Proto','D'),ancestry_path=['D'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
+                                    direct_parent=db.Key.from_path('P','D'),ancestry_path=['D'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
                                    
         self.models.append(self.P(_class=StatDescriptor,
-                                    direct_parent=db.Key.from_path('Proto','D'),ancestry_path=['D'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
+                                    direct_parent=db.Key.from_path('P','D'),ancestry_path=['D'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
                                    
         self.models.append(self.P(_class=RevisionDescriptor,
-                                    direct_parent=db.Key.from_path('Proto','D'),ancestry_path=['D'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
+                                    direct_parent=db.Key.from_path('P','D'),ancestry_path=['D'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
                                    
         self.models.append(self.P(_class=SourceDescriptor,
-                                    direct_parent=db.Key.from_path('Proto','D'),ancestry_path=['D'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
+                                    direct_parent=db.Key.from_path('P','D'),ancestry_path=['D'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
                                    
         self.models.append(self.P(_class=StorageRefDescriptor,
-                                    direct_parent=db.Key.from_path('Proto','D'),ancestry_path=['D'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
+                                    direct_parent=db.Key.from_path('P','D'),ancestry_path=['D'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
         
         return self.models

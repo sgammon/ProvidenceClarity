@@ -9,6 +9,7 @@
 -- created to/from protobuf helpers in the CacheController
 -- created and perfected CachedProtobuf and CachedProtobufList properties
 -- created database models QueuedTask, QueuedTransaction, and others in data.data
+-- added Expando core model branch (_PC_MODEL_BRANCH = __EXPANDO__)
 
 
 0.1.5.102 DEV:

@@ -42,19 +42,19 @@ class ProtoHelper(DataManager):
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
                                    
         self.models.append(self.P(_class=DataReceiver,
-                                    direct_parent=db.Key.from_path('Proto','DataInput'),ancestry_path=['DataInput'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=True,uses_parent=False,uses_id=False,
+                                    direct_parent=db.Key.from_path('P','DataInput'),ancestry_path=['DataInput'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=True,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use='Unique receiver name (used in receiver URL).',keyid_use=None,keyparent_use=None))
                                    
         self.models.append(self.P(_class=DataScraper,
-                                    direct_parent=db.Key.from_path('Proto','DataInput'),ancestry_path=['DataInput'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=True,uses_parent=False,uses_id=False,
+                                    direct_parent=db.Key.from_path('P','DataInput'),ancestry_path=['DataInput'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=True,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use='Unique scraper name (used in scraper URL).',keyid_use=None,keyparent_use=None))
         
         self.models.append(self.P(_class=DataSource,
-                                    direct_parent=db.Key.from_path('Proto','DataInput'),ancestry_path=['DataInput'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
+                                    direct_parent=db.Key.from_path('P','DataInput'),ancestry_path=['DataInput'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True))
                                    
         self.models.append(self.P(_class=DataFeed,
-                                    direct_parent=db.Key.from_path('Proto','DataInput'),ancestry_path=['DataInput'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
+                                    direct_parent=db.Key.from_path('P','DataInput'),ancestry_path=['DataInput'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True))
         
         return self.models

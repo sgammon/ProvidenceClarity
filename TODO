@@ -7,6 +7,20 @@
 -- add exception handling (and exceptions) to receiver class
 -- fill out descriptor classes, figure out automatic system to pull descriptors related to a module
 -- make things like analyzer automatically pull related descriptors, inject them into config
+-- implement exception instead of lazy fail for loading pc_config file (/__init__.py)
+-- add fallback to regular from_protobuf for de-encoding of PB's. (api/cache/__init__.py)
+-- add localization to exceptions
+-- find a way to store importerrors/proto errors/other db errors in the database
+-- find out what to do with the results of proto operations - store in db?
+-- make model path seperator (defaults to ':') customizable
+-- make CachedProtobufList property work and fix attachments property on QueuedTransaction
+-- move descriptor API under data API
+-- add XML encoding for API responders
+-- error handling for type decisions in the data API
+-- make and use exceptions for input (receiver/scraper) class
+-- write scraper and receiver code
+-- error handling for handlers/workers (with automatic dump of error to client through API)
+
 
 
 DEVELOPMENT ROADMAP:

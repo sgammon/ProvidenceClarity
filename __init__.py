@@ -13,6 +13,7 @@ import os, sys
 
 ## Import Details
 __all__ = ['api','data','services','main']
+__protos__ = ['data']
 
 ## Declare Globals
 version_major = 0.5
@@ -61,5 +62,6 @@ def initialize(config='pc_config_default'):
     p.config_path = config
     p.config = config_mod
     config_module = config_mod
+
     
     return p

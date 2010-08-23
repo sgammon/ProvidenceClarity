@@ -1,11 +1,12 @@
 __all__ = ['cacher','indexer','proto']
 
-import logging
+import logging, exceptions
 from google.appengine.ext import db, blobstore
+from google.appengine.api.labs import taskqueue
 from ProvidenceClarity.main import PCController
-from ProvidenceClarity.api.data import exceptions
 from ProvidenceClarity.api.util import import_helper
-from ProvidenceClarity.data.core.natural import NaturalKind
+from ProvidenceClarity.data.core import _PC_MODEL_BRANCH_POLY
+from ProvidenceClarity.data.core.expando import Expando
 
 from ProvidenceClarity.data.core.properties.polymodel import _ClassKeyProperty, _ModelPathProperty
 
@@ -70,6 +71,8 @@ class DataController(PCController):
         
         from ProvidenceClarity.data.entity import E
         
+        entity_class = entity.__class__
+        
         ## only accepts polymodel instances
         if hasattr(entity, '_PC_MODEL_BRANCH'):
             if getattr(entity, '_PC_MODEL_BRANCH') == '_POLY_':
@@ -85,8 +88,12 @@ class DataController(PCController):
                     return (entity, None)
                 else:
                     raise exceptions.InvalidPolyInput('Invalid PC model branch.')
-        
-        k = entity.key()
+
+        try:
+            k = entity.key()
+        except:
+            k = db.Key.from_path('E',1)
+            
         
         if isinstance(k.id_or_name(), str): ## if it has a keyname, namespace and honor it
             _e_key = db.Key.from_path('E', entity._getNamespacedKeyName(k.name()))
@@ -115,10 +122,10 @@ class DataController(PCController):
                 n_prop[item] = e_prop[item]
 
         ## create and instantiate model class
-        ClassObj = type(entity.class_key()[-1], (NaturalKind,), n_prop)
+        ClassObj = type(entity.class_key()[-1], (Expando,), n_prop)
 
         natural_kind_record = ClassObj(key=_n_key, **kwargs)
-        t_entity = E(key=_e_key) ## create trimmed entity
+        t_entity = entity_class(key=_e_key) ## create trimmed entity
         
         for prop in n_prop:
             setattr(natural_kind_record, prop, getattr(entity, prop))
@@ -127,12 +134,14 @@ class DataController(PCController):
                setattr(t_entity, prop, getattr(entity, prop)) ## move indexed properties over to new Entity
         
         return t_entity, natural_kind_record
-
+        
+        
 
 # Utility class for proto and dev structure
 class DataManager(object):
     
     models = []
+    entities = []
     P = None
     
     def __init__(self):
@@ -235,13 +244,41 @@ class DataManager(object):
             
     def do_base(self):
         
+        from ProvidenceClarity.data.entity import E
+        from ProvidenceClarity.api.data.transaction import TransactionController
+        
         self.models = []
+        self.entities = []
         
         if hasattr(self, 'base'):
-            self.models = self.base()
-            if isinstance(self.models, list):
             
-                return db.put(self.models)          
+            logging.info('Has base.')
+            
+            self.base()
+            
+            if isinstance(self.models, list):
+                
+                models_list = []
+                entities_list = self.entities[:]
+                
+                for item in range(0, len(self.models)):
+                    
+                    if hasattr(self.models[item], '_PC_MODEL_BRANCH') and getattr(self.models[item], '_PC_MODEL_BRANCH') == _PC_MODEL_BRANCH_POLY:
+                        entities_list.append(self.models[item])
+                    else:
+                        models_list.append(self.models[item])
+                        
+            else:
+                return None
+                
+            if models_list is not None and isinstance(models_list, list) and len(models_list) > 0:
+
+                mod = db.put(models_list)
+            else:
+                mod = None
+                
+            if entities_list is not None and isinstance(entities_list, list) and len(entities_list) > 0:
+                ent = TransactionController.batchQueuedTransaction('entityCreate', entities_list)
         else:
-            pass
+            return True
     

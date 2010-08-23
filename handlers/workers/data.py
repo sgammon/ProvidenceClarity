@@ -78,7 +78,7 @@ class TransactionWorker(RequestHandler):
                                 logging.info('Caching requested. Queueing request...')
                                 
                                 cache_queue, cache_task = CacheController.queueNewEntity(entity, return_task=True)
-                                cache_task.add(cache__queue.name, transactional=True)
+                                cache_task.add(cache_queue.name, transactional=True)
 
 
                             logging.info('Adding E and N to commit list...')
@@ -108,6 +108,7 @@ class TransactionWorker(RequestHandler):
                             q.keys_only = True
                             c = q.count()
                             commit_list['deletes'] = q.fetch(c.count())
+                            db.delete(commit_list['deletes'])
                     
                     elif mode == None:
                         ## @TODO: error handling
@@ -132,6 +133,8 @@ class TransactionWorker(RequestHandler):
 
                 finally:
                     ## @TODO: update ticket
+                    ticket.status = 'complete'
+                    ticket.put()
                     self.render_raw('<b>Transaction success</b>')
             
             else:

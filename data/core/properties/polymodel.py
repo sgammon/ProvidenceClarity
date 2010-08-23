@@ -21,6 +21,7 @@ class _ModelPathProperty(db.StringProperty):
         if model_instance is None: return self
         # @TODO: make seperator customizable from some import/config
         return model_instance._getModelPath(':')
+        
 
 ## +=+=+ Stores the polymodel class inheritance path.
 class _ClassKeyProperty(db.ListProperty):

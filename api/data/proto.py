@@ -91,6 +91,7 @@ class ProtoController(object):
         if isinstance(module, (basestring, type(sys))):
             return True
         else:
+            logging.info('Invalid module')
             return False
     
     @classmethod
@@ -100,15 +101,17 @@ class ProtoController(object):
             if do_log: logging.info('[i]: Recursive action got False module.')
             return None
 
-        if do_log: logging.info('[i]: Recursive action on \''+str(module.__name__)+'\'.')
+        if do_log: logging.info('[i]: Recursive action on \''+str(module)+'\'.')
 
         if cls._valid_module(module):
 
             if isinstance(module, basestring):
-                module = cls.import_helper(module,['ProtoController','__protos__'])
+                module = cls.import_helper(module)
+                
 
             ## start with the top-level import
             if hasattr(module, 'ProtoHelper'):
+                
                 
                 if do_log: logging.info('[i]: ==== Found module-level ProtoHelper.')                
                 

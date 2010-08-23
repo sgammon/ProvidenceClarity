@@ -36,14 +36,20 @@ class CacheController(PCController):
         else:
             logging.critical('No data class path pointer found.') ##@TODO: fallback to regular from entity
 
-        if _n_obj.key().parent() is not None:
-            if _n_obj.key().name() is not None:
-                obj = model(_n_obj.key().parent(),key_name=_n_obj.key().name())
+        if _n_obj.parent() is not None:
+            if _n_obj.is_saved():
+                if _n_obj.key().name() is not None:
+                    obj = model(_n_obj.key().parent(),key_name=_n_obj.key().name())
+                else:
+                    obj = model(_n_obj.key().parent())
             else:
-                obj = model(_n_obj.key().parent())
+                obj = model(_n_obj.parent())
         else:
-            if _n_obj.key().name() is not None:
-                obj = model(key_name=_n_obj.key().name())
+            if _n_obj.is_saved():
+                if _n_obj.key().name() is not None:
+                    obj = model(key_name=_n_obj.key().name())
+                else:
+                    obj = model()
             else:
                 obj = model()
 
@@ -61,7 +67,8 @@ class CacheController(PCController):
         logging.info('=========== Model to Protobuf ===========')
         logging.info('Model: '+str(model_instance))
         
-        if model_instance.key().parent() is not None:
+        
+        if model_instance.parent() is not None:
             
             logging.info('Model has parent.')
             
@@ -77,14 +84,16 @@ class CacheController(PCController):
         else:
             logging.info('Model has no parent.')
             
-            if model_instance.key().name() is not None:
-                logging.info('Model has key name.')
-                n = NormalizedObject(key_name=model_instance.key().name())
+            if model_instance.is_saved():
+                if model_instance.key().name() is not None:
+                    logging.info('Model has key name.')
+                    n = NormalizedObject(key_name=model_instance.key().name())
+                else:
+                    logging.info('Model has no key name.')
+                    n = NormalizedObject()
             else:
-                logging.info('Model has no key name.')
                 n = NormalizedObject()
-            
-        logging.info('nE: '+str(n))        
+        
         logging.info('Copying model properties...')
         
         _props = model_instance.properties()
@@ -149,7 +158,7 @@ class CacheController(PCController):
             task_params[item] = task_opts[item]
         
         q = taskqueue.Queue(name='cacher')
-        t = taskqueue.Task(name=str(entity),params=task_params)
+        t = taskqueue.Task(params=task_params)
         if return_task == True:
             return (q, t)
         else:

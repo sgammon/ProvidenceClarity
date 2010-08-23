@@ -12,6 +12,7 @@ class ServiceAdapter(Model, CreatedModifiedMixin):
     description = db.TextProperty()
     homepage = db.LinkProperty()
     docs = db.LinkProperty()
+    adapter_handler = db.StringProperty()
     
 
 class ServiceRequest(Model, CreatedModifiedMixin):
@@ -37,6 +38,15 @@ class ProtoHelper(DataManager):
         self.models.append(self.P(_class=ServiceRequest,
                                     direct_parent=None,ancestry_path=[],abstract=False,derived=False,is_data=False,poly_model=False,uses_keyname=False,uses_parent=True,uses_id=True,
                                    created_modified=True,keyname_use=None,keyid_use='Unique number for request.',keyparent_use='Service adapter request was issued to.'))
+        
+        return self.models
+        
+        
+    def base(self):
+        
+        self.models.append(ServiceAdapter(key_name='freebase',name='Freebase',description='Open schema-powered datastore used in PC for disambiguation and for general information on inputted entities.',homepage=db.Link('http://www.freebase.com/'),docs=db.Link('http://wiki.freebase.com/wiki/Main_Page')))
+        self.models.append(ServiceAdapter(key_name='googlenews',name='Google News',description='News aggregation service used in PC for finding articles related to entities.',homepage=db.Link('http://news.google.com'),docs=db.Link('http://code.google.com/apis/ajaxsearch/')))
+        self.models.append(ServiceAdapter(key_name='opencalais',name='OpenCalais',description='Semantic analysis service provided by Reuters and used in PC for pulling entities out of unstructured information.',homepage=db.Link('http://http://www.opencalais.com/'),docs=db.Link('http://www.opencalais.com/documentation/opencalais-documentation')))
         
         return self.models
     
