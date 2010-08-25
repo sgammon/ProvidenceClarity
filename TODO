@@ -26,16 +26,20 @@
 DEVELOPMENT ROADMAP:
 
 -- v1.5 DEV:
-	-Prototype that accepts input via working receivers/scrapers, automatically passes through working object
-	and relation analyzers, stores analyzed data, and outputs basic (XHTML/table based) visualizations.
 	-Working schema for descriptors and protos.
 	-Automatic proto-management methods
 	-Automatic input (receiver/scraper) methods
 
--- v1.6 ALPHA:
+-- v1.6 DEV:
+	-Rewritten components to bring out of DEV and into ALPHA state.
+	-Support for multitenancy.
+	-Prototype that accepts input via working receivers/scrapers, automatically passes through working object
+	and relation analyzers, stores analyzed data, and outputs basic (XHTML/table based) visualizations.
+
+-- v1.7 DEV:
 	-Basic working graph visualizer, basic chart generator, hooked up to object CRUD interface.
 	
--- v1.7 ALPHA:
+-- v1.8 ALPHA:
 	-Working index generator, and index normalizer.
 	-Working cache generator, and cache manager.
 	-Working statistics analyzer.

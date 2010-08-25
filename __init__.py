@@ -3,21 +3,22 @@
 #   |==|  PROVIDENCE/CLARITY DATA ANALYSIS PLATFORM  |==|
 #   |==|     -----------------------------------     |==|
 #   |==| Author: Sam Gammon <sg@samgammon.com>       |==|
-#   |==| Version: 0.5 ALPHA                          |==|
+#   |==| Version: 0.1 DEV                          |==|
 #   |==| ------------------------------------------- |==|
 #   |==|   COPYRIGHT (c) 2010. ALL RIGHTS RESERVED   |==|
 #   =====================================================
 #
 
-import os, sys
+import os, sys, logging, exceptions
+
 
 ## Import Details
 __all__ = ['api','data','services','main']
 __protos__ = ['data']
 
 ## Declare Globals
-version_major = 0.5
-version_minor = 1.31
+version_major = 0.1
+version_minor = 6.0
 config_module = None
 build = 'DEV'
 
@@ -26,7 +27,7 @@ VERSION = str(version_major)+'.'+str(version_minor)+' '+str(build)
 PC_PATH = os.path.join(os.path.dirname(__file__))
 
 ## Init and return a ProvidenceClarity object
-def initialize(config='pc_config_default'):
+def initialize(namespace=None,config='pc_config'):
 
     # === 0: Grab Globals
     global version_major
@@ -40,8 +41,8 @@ def initialize(config='pc_config_default'):
         sys.path.insert(1,'lib')
 
     # === 2: Load Config
-    try: config_mod = __import__(config,globals(),locals(),[],-1);
-    except ImportError: exit() # @TODO: Implement error/exception here
+    try: config_mod = __import__(config,globals(),locals(),['get','dump','config'],-1);
+    except ImportError: raise exceptions.InvalidConfig()
 
     # === 3: Import Masterclass    
     from main import ProvidenceClarity
@@ -50,18 +51,20 @@ def initialize(config='pc_config_default'):
     software_t = '/'.split(os.environ['SERVER_SOFTWARE'])
     if software_t[0].lower() == 'development': platform = 'Dev';
     else: platform = 'Production'
+    
+    domain = os.environ['HTTP_HOST'].split(':')[0].split('.')
+    if domain[-1] == 'com':
+        subdomain = domain[0]
+    else:
+        subdomain = None
+
+    if namespace is not None:
+        _ns = subdomain
+    else:
+        _ns = namespace
 
     # === 5: Create the Object
-    p = ProvidenceClarity()
+    p = ProvidenceClarity(config_mod,namespace=_ns,version={'major':version_major,'minor':version_minor,'full':str(version_major)+'.'+str(version_minor)+' '+str(build),'build':build})
     
-    # === 6: Assign Properties
-    p.version_major = version_major
-    p.version_minor = version_minor
-    p.version = str(version_major)+'.'+str(version_minor)+' '+str(build)
-    p.build = build
-    p.config_path = config
-    p.config = config_mod
-    config_module = config_mod
-
     
     return p

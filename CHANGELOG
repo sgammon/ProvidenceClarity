@@ -1,4 +1,17 @@
-==== Providence/Clarity Changelog ====
+================================== Providence/Clarity Changelog ==================================
+
+0.1.6.000 DEV:
+-- new DataController methods for automated queued task management
+-- support for automatic namespacing via subdomain
+-- refactored core polymodel logic, renamed to polypro and open sourced (@TODO)
+-- automatic key name namespacing for entity/natural split (@TODO)
+-- rewritten logic for QueuedTransactions
+-- rewritten CacheController protobuf methods for more accurate protobuffing
+-- generateNaturalKind rewritten to use native model instead of NormalizedObject
+-- handlers and templates written for system management panel
+-- data-hygiene queue written and used automatically with cron scheduling and queued jobs
+-- receiver class written and starting to accept input
+
 
 0.1.5.103 DEV:
 -- fixed automatic key_name namespacing problems when retrieving from db

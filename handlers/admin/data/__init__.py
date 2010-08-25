@@ -14,7 +14,7 @@ class DataList(RequestHandler):
     
     def get(self):
         
-        pass
+        self.render_raw('<b>HTML Output</b>')
    
    
 class DataCreate(RequestHandler):

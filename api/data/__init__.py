@@ -5,7 +5,7 @@ from google.appengine.ext import db, blobstore
 from google.appengine.api.labs import taskqueue
 from ProvidenceClarity.main import PCController
 from ProvidenceClarity.api.util import import_helper
-from ProvidenceClarity.data.core import _PC_MODEL_BRANCH_POLY
+from ProvidenceClarity.data.core import _PC_MODEL_BRANCH_POINTER, _PC_MODEL_BRANCH_POLY
 from ProvidenceClarity.data.core.expando import Expando
 
 from ProvidenceClarity.data.core.properties.polymodel import _ClassKeyProperty, _ModelPathProperty
@@ -64,10 +64,29 @@ class DataController(PCController):
             return False
         
         return imported_class
+    
+    
+    @classmethod
+    def generateNaturalKind(cls, entity, softfail=False, nk_opts={}, **kwargs):
         
+        if hasattr(entity, _PC_MODEL_BRANCH_POINTER):
+            if getattr(entity, _PC_MODEL_BRANCH_POINTER) == _PC_MODEL_BRANCH_POLY:
+                if hasattr(entity, 'class_key') and entity.class_key()[-1] == E.__name__:
+                    if softfail is True:
+                        return (entity, None)
+                    else:
+                        raise exceptions.InvalidPolyInput('Cannot convert root E to a natural kind.') ## @TODO: String Localization
+                else
+                    if softfail is True:
+                        return (entity, None)
+                    else:
+                        raise exceptions.InvalidPolyInput('Cannot convert entity with root other than __POLY__ to a natural kind.')
+        try:
+            ## Grab entity key name, if any
+            if hasattr(entity, '_key_name'):
         
     @classmethod
-    def generateNaturalKind(cls, entity, softfail=False, **kwargs):
+    def generateNaturalKind_legacy(cls, entity, softfail=False, **kwargs):
         
         from ProvidenceClarity.data.entity import E
         

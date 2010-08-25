@@ -6,7 +6,17 @@ config = {
     'platform':
     {
         'name':'Providence/Clarity',
-        'public':False
+        'public':False,
+    },
+    
+    'multitenancy':
+    {
+        'enable':True,
+        'default_namespace':'_global_',
+        'force_namespace':False,
+        'logging': True,
+        'apps_mode_force':False,
+        'apps_subdomain':'apps',
     },
 
     'logging':
