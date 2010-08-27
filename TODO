@@ -47,6 +47,6 @@ DEVELOPMENT ROADMAP:
 -- v2.0 BETA:
 	-Fully-built data API, input API, output API
 	-Application strings moved to Babel
+	-Graph generator that leverages statistics data to place/color/mark entities.	
 	-PolyModel-independent data schema that uses normalized, derived entity indexes instead of a single
 	object kind and related entity indexes.
-	-Graph generator that leverages statistics data to place/color/mark entities.

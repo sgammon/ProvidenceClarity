@@ -16,13 +16,53 @@ import exceptions
 from google.appengine.api import namespace_manager
 
 
-class PCPlatformFactory(type):
+# Master meta-class for all P/C-related classes
+class ProvidenceClarityClass(type):
+    
+    def __call__(metacls, name, bases, dictionary):
+        return super(ProvidenceClarityClass, metacls).__call__(name, bases, dictionary)
+        
+
+# Controls the creation of the Platform class and object
+class ProvidenceClarityPlatform(type):
+    
+    __metaclass__ = ProvidenceClarityClass
     
     def __new__(meta, classname, bases, classDict):
-        return type.__new__(meta, classname, bases, classDict)    
+        return type.__new__(meta, classname, bases, classDict)
+    
 
+# Controls the loading and creation of PC Controllers and proxies
+class ProvidenceClarityController(type):
+    
+    __metaclass__ = ProvidenceClarityClass
+    
+    def __new__(meta, classname, bases, classDict):
+        return type.__new__(meta, classname, bases, classDict)
+        
 
-class ProvidenceClarity(object):
+# Proxies a PC controller into the platform object
+class PCControllerProxy(object):
+
+    __metaclass__ = PCControllerFactory
+    c_class = None
+
+    def __init__(self, controller):
+        if isinstance(controller, ProvidenceClarityController):
+            self.c_class = controller
+    
+    def __get__(self, instance, owner):
+        
+        
+    def __set__(self, instance, value):
+        raise NotImplemented('Platform controller properties are read-only.')
+        
+    def __delete__(self, instance):
+        raise NotImplemented('Platform controller properties are read-only.')
+        
+
+# Providence Clarity Platform!
+class Platform(object):
 
     """
     
@@ -103,7 +143,7 @@ class ProvidenceClarity(object):
         if 'version' in kwargs:
             self.version = kwargs['version']
         
-        super(ProvidenceClarity, self).__init__()
+        super(Platform, self).__init__()
     
     ## ===== 4: Class Methods
     @classmethod
@@ -114,6 +154,23 @@ class ProvidenceClarity(object):
     def version(cls):
         return cls.version
     
+
+## Exception Master
+class PCException(Exception):
+
+    message = None
+
+    def __init__(self, msg=None):
+        self.message = msg
+        
+    
+## Master Controller Object
+class PCController(object):
+    pass
+    
+
+# Log controller for logging
+class PCLogController(PCController):
     # Logger wrapper, based on current config
     def log(self,message_i, level='debug'):
         
@@ -152,18 +209,4 @@ class ProvidenceClarity(object):
         
     # Log wrapper for exit
     def exit(self, message):
-        return self.log(message,'exit')
-        
-        
-## Exception Master
-class PCException(Exception):
-
-    message = None
-
-    def __init__(self, msg=None):
-        self.message = msg
-        
-    
-## Master Controller Object
-class PCController(object):
-    pass
+        return self.log(message,'exit')    
