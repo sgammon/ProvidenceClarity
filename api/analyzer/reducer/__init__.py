@@ -1,5 +1,12 @@
-from .. import AnalyzerController
+from .. import AnalyzerController, AnalyzerAdapter
 
 
-class ReducerAnalyzer(AnalyzerController):
+class ReducerController(AnalyzerController):
     pass
+
+
+class ReducerAnalyzer(AnalyzerAdapter):
+    pass
+    
+    
+_controller = ReducerController

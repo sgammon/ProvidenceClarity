@@ -1,5 +1,8 @@
-from ProvidenceClarity.main import PCController
+from ProvidenceClarity import PCController
 
 
 class MediaController(PCController):
     pass
+    
+    
+_controller = MediaController    

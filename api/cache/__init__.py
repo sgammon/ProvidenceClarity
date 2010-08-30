@@ -5,7 +5,7 @@ from google.appengine.api import datastore
 from google.appengine.api.labs import taskqueue
 
 from ProvidenceClarity import pc_config
-from ProvidenceClarity.main import PCController
+from ProvidenceClarity import PCController
 from ProvidenceClarity.api.data import DataController
 
 from ProvidenceClarity.data.cache import NormalizedObject
@@ -163,3 +163,6 @@ class CacheController(PCController):
             return (q, t)
         else:
             return q.add(t)
+            
+            
+_controller = CacheController

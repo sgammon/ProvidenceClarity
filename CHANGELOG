@@ -1,6 +1,9 @@
 ================================== Providence/Clarity Changelog ==================================
 
 0.1.6.000 DEV:
+-- new PCStateProxy object on prop 'state' on Platform for managing app state
+-- new PCClockProxy object on prop 'clock' on Platform for managing app timepoints
+-- new PCAPIProxy object on prop 'api' on Platform for proxying controller requests
 -- new DataController methods for automated queued task management
 -- support for automatic namespacing via subdomain
 -- refactored core polymodel logic, renamed to polypro and open sourced (@TODO)

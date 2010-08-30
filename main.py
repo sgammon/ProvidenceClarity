@@ -17,16 +17,16 @@ from google.appengine.api import namespace_manager
 
 
 # Master meta-class for all P/C-related classes
-class ProvidenceClarityClass(type):
+class ProvidenceClarityObject(type):
     
     def __call__(metacls, name, bases, dictionary):
-        return super(ProvidenceClarityClass, metacls).__call__(name, bases, dictionary)
+        return super(ProvidenceClarityObject, metacls).__call__(name, bases, dictionary)
         
 
 # Controls the creation of the Platform class and object
 class ProvidenceClarityPlatform(type):
     
-    __metaclass__ = ProvidenceClarityClass
+    __metaclass__ = ProvidenceClarityObject
     
     def __new__(meta, classname, bases, classDict):
         return type.__new__(meta, classname, bases, classDict)
@@ -35,7 +35,7 @@ class ProvidenceClarityPlatform(type):
 # Controls the loading and creation of PC Controllers and proxies
 class ProvidenceClarityController(type):
     
-    __metaclass__ = ProvidenceClarityClass
+    __metaclass__ = ProvidenceClarityObject
     
     def __new__(meta, classname, bases, classDict):
         return type.__new__(meta, classname, bases, classDict)
@@ -44,7 +44,7 @@ class ProvidenceClarityController(type):
 # Proxies a PC controller into the platform object
 class PCControllerProxy(object):
 
-    __metaclass__ = PCControllerFactory
+    __metaclass__ = ProvidenceClarityController
     c_class = None
 
     def __init__(self, controller):
@@ -52,7 +52,7 @@ class PCControllerProxy(object):
             self.c_class = controller
     
     def __get__(self, instance, owner):
-        
+        pass
         
     def __set__(self, instance, value):
         raise NotImplemented('Platform controller properties are read-only.')
@@ -91,7 +91,7 @@ class Platform(object):
     
     """
 
-    __metaclass__ = PCPlatformFactory
+    __metaclass__ = ProvidenceClarityPlatform
 
     ## ===== 1: Properties (Initialized Externally)
     version     = None
@@ -144,6 +144,9 @@ class Platform(object):
             self.version = kwargs['version']
         
         super(Platform, self).__init__()
+        
+    #def __repr__(self):
+    #    return '<ProvidenceClarity '
     
     ## ===== 4: Class Methods
     @classmethod

@@ -1,4 +1,4 @@
-==== Providence/Clarity Todo ====
+==== Providence/Clarity: Todo List ====
 
 -- add actual code to storage API for easy storage of data to blobstore and webstorage
 -- add parent for receiver extension (data handler) to enforce existence of important methods (process_data)
@@ -20,6 +20,7 @@
 -- make and use exceptions for input (receiver/scraper) class
 -- write scraper and receiver code
 -- error handling for handlers/workers (with automatic dump of error to client through API)
+-- service adapter framework fill-out: automatic error handling, re-queuing, and storing/managing requests to services
 
 
 
@@ -31,12 +32,12 @@ DEVELOPMENT ROADMAP:
 	-Automatic input (receiver/scraper) methods
 
 -- v1.6 DEV:
-	-Rewritten components to bring out of DEV and into ALPHA state.
+	-Rewritten DataController and handlers for processing data queues.
 	-Support for multitenancy.
 	-Prototype that accepts input via working receivers/scrapers, automatically passes through working object
 	and relation analyzers, stores analyzed data, and outputs basic (XHTML/table based) visualizations.
 
--- v1.7 DEV:
+-- v1.7 ALPHA:
 	-Basic working graph visualizer, basic chart generator, hooked up to object CRUD interface.
 	
 -- v1.8 ALPHA:

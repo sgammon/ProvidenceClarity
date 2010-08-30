@@ -1,6 +1,12 @@
+from .. import AdapterInterface
+from ProvidenceClarity import PCController
 from ProvidenceClarity.data.data import ORIGIN_LIST, FORMAT_LIST, DataStub, BlobstoreData, WebStorageData
 
-class StorageBackend(object):
+
+class StorageController(PCController):
+    pass
+
+class StorageAdapter(AdapterInterface):
 
     stub = None
 

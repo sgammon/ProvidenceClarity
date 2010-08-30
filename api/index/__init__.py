@@ -2,7 +2,7 @@ from google.appengine.ext import db
 from google.appengine.api.labs import taskqueue
 
 from ProvidenceClarity import pc_config
-from ProvidenceClarity.main import PCController
+from ProvidenceClarity import PCController
 
 url_prefix = pc_config.get('pc_url_prefix','handlers','/_pc')
 
@@ -24,3 +24,6 @@ class IndexController(PCController):
             return (q, t)
         else:
             return q.add(t)
+            
+            
+_controller = IndexController

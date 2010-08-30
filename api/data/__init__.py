@@ -3,7 +3,7 @@ __all__ = ['cacher','indexer','proto']
 import logging, exceptions
 from google.appengine.ext import db, blobstore
 from google.appengine.api.labs import taskqueue
-from ProvidenceClarity.main import PCController
+from ProvidenceClarity import PCController
 from ProvidenceClarity.api.util import import_helper
 from ProvidenceClarity.data.core import _PC_MODEL_BRANCH_POINTER, _PC_MODEL_BRANCH_POLY
 from ProvidenceClarity.data.core.expando import Expando
@@ -45,7 +45,9 @@ OTHER_TYPE_FLAG = '_other_'
             
 # Abstract class for data-handling API modules
 class DataController(PCController):
-
+    
+    _subcontrollers = {'proto':['proto','ProtoController'],'tasks':['tasks','TaskController'],'transaction':['transaction','TransactionController']}
+    
     @classmethod
     def import_model(cls, classpath):
 
@@ -76,7 +78,7 @@ class DataController(PCController):
                         return (entity, None)
                     else:
                         raise exceptions.InvalidPolyInput('Cannot convert root E to a natural kind.') ## @TODO: String Localization
-                else
+                else:
                     if softfail is True:
                         return (entity, None)
                     else:
@@ -84,6 +86,10 @@ class DataController(PCController):
         try:
             ## Grab entity key name, if any
             if hasattr(entity, '_key_name'):
+                pass #### LEFT OFF HERE!!!!! ###
+                
+        except:
+            pass
         
     @classmethod
     def generateNaturalKind_legacy(cls, entity, softfail=False, **kwargs):
@@ -301,3 +307,5 @@ class DataManager(object):
         else:
             return True
     
+    
+_controller = DataController

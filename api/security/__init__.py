@@ -4,11 +4,16 @@ from google.appengine.ext import db
 from google.appengine.api import memcache
 
 import exceptions
-from ProvidenceClarity import pc_config
+from ProvidenceClarity import pc_config, PCController
 from ProvidenceClarity.data.security import SecurityKey, GenericKey, AccountKey
 
+
+class SecurityController(PCController):
+    pass
+    
+
 ## API for managing SecurityAccounts
-class AccountController(object):
+class AccountController(PCController):
     
     @classmethod
     def provision_account(cls, **kwargs):
@@ -32,7 +37,7 @@ class AccountController(object):
     
 
 ## API for managing SecurityKeys
-class KeyController(object):
+class KeyController(PCController):
     
     
     ### Key Methods
@@ -125,7 +130,7 @@ class KeyController(object):
             raise exceptions.KeyNotFound
             
             
-class SecurityKeyController(object):
+class SecurityKeyController(PCController):
 
     ## Checks and increments for use
     @classmethod    
@@ -186,3 +191,6 @@ class SecurityKeyController(object):
             
             # Return true if all tests pass
             return True
+            
+            
+_controller = SecurityController

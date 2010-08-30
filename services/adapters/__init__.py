@@ -30,6 +30,9 @@ class ServiceAdapter(object):
         
     def _process_response(self, response):
         return None
+        
+    def _process_error(self, errorget):
+        return None
 
     def _cleanup(self):
         return True
@@ -57,11 +60,16 @@ class ServiceAdapter(object):
         # perform any init stuff
         cls._init()
         
-        # perform actual call & process response
-        response = cls._process_response(cls._issue_call(*args, **kwargs))
-        
-        # do cleanup
-        cls._cleanup()
+        try:
+            # perform actual call & process response
+            response = cls._process_response(cls._issue_call(*args, **kwargs))
+
+        except Exception, e:
+            cls._process_error(e)
+
+        finally:
+            # do cleanup
+            cls._cleanup()
         
         # return response
         return response

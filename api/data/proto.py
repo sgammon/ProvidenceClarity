@@ -8,7 +8,7 @@ from ProvidenceClarity.data.proto import P
 
 do_log = pc_config.get('log_imports','api.data.proto.ProtoController',False)
 
-class ProtoController(object):
+class ProtoController(DataController):
             
     @classmethod
     def import_helper(cls,name,fromlist=None):

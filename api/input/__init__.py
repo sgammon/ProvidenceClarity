@@ -1,5 +1,5 @@
 from .. import AdapterInterface
-from ProvidenceClarity.main import PCController
+from ProvidenceClarity import PCController
 
 
 class InputAdapter(AdapterInterface):
@@ -7,4 +7,8 @@ class InputAdapter(AdapterInterface):
     
     
 class InputController(PCController):
-    pass
+
+    _subcontrollers = {'receiver':['receiver','ReceiverController'],'scraper':['scraper','ScraperController']}
+    
+    
+_controller = InputController

@@ -1,8 +1,8 @@
 from google.appengine.ext import blobstore
-from ProvidenceClarity.api.storage import StorageBackend
+from ProvidenceClarity.api.storage import StorageAdapter
 
 
-class BlobstoreBackend(StorageBackend):
+class BlobstoreBackend(StorageAdapter):
     
     @classmethod
     def store(cls, key, data):

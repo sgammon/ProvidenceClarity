@@ -1,5 +1,9 @@
-from ProvidenceClarity.main import PCController
+from ProvidenceClarity import PCController
 
 
 class DevController(PCController):
-    pass
+
+    _subcontrollers = {'firstrun':['firstrun','FirstRunController']}
+    
+    
+_controller = DevController

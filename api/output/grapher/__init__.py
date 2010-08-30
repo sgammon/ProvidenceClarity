@@ -1,5 +1,9 @@
-from .. import OutputAdapter
+from .. import OutputAdapter, OutputController
 
 
-class Grapher(OutputAdapter):
+class GraperController(OutputController):
+    pass
+
+
+class GrapherAdapter(OutputAdapter):
     pass

@@ -1,5 +1,12 @@
-from .. import AnalyzerController
+from .. import AnalyzerController, AnalyzerAdapter
 
 
-class RelationAnalyzer(AnalyzerController):
+class RelationAnalyzerController(AnalyzerController):
     pass
+
+
+class RelationAnalyzer(AnalyzerAdapter):
+    pass
+    
+    
+_controller = RelationAnalyzerController

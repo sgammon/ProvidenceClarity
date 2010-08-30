@@ -1,5 +1,12 @@
-from .. import AnalyzerController
+from .. import AnalyzerController, AnalyzerAdapter
 
 
-class ObjectAnalyzer(AnalyzerController):
+class ObjectAnalyzerController(AnalyzerController):
     pass
+
+
+class ObjectAdapter(AnalyzerAdapter):
+    pass
+    
+    
+_controller = ObjectAnalyzerController
