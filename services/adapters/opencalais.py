@@ -11,34 +11,20 @@ class OpenCalais(ServiceAdapter):
     # Service Adapter Properties
     adapter_name = 'opencalais'
     required_config = ['open_calais_key']
-    calais_endpoint = 'http://api.opencalais.com/enlighten/rest/'
-    
-    # Default Parameters to Include
-    base_params =  {'outputFormat':  'Application/JSON',
+    calais_endpoint = 'http://api.opencalais.com/tag/rs/enrich'
+
+    # Headers to include
+    base_headers = {'x-calais-licenseID':None,
+                    'content-type':None,
+                    'accept':'application/json',
                     'calculateRelevanceScore':  'true',
                     'enableMetadataType':  'GenericRelations,SocialTags',
-                    'docRDFaccessible':  'false',
+                    'docRDFaccessible':  'true',
                     'allowDistribution':  'false',
                     'allowSearch':  'false',
                     'submitter':  'Providence/Clarity INC'}
-                    
-    params_template = '''
-
-    <c:params xmlns:c="http://s.opencalais.com/1/pred/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     
-        <c:processingDirectives c:contentType="$contentType" c:enableMetadataType="$enableMetadataType" c:outputFormat="$outputFormat" c:docRDFaccesible="$docRDFaccessible" >
-        </c:processingDirectives>
-
-        <c:userDirectives c:allowDistribution="$allowDistribution" c:allowSearch="$allowSearch" c:externalID="$externalID" c:submitter="$submitter">
-        </c:userDirectives>
-
-        <c:externalMetadata>
-        </c:externalMetadata>
     
-    </c:params>
-
-    '''
-
     @classmethod
     def _firstrun(cls):
         return self.service_adapter_d(key_name='opencalais',name='OpenCalais',description='Converts unstructured text into structured, linked entities.',

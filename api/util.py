@@ -1,28 +1,61 @@
 import logging
+from ProvidenceClarity import pc_config
+
+do_logging = pc_config.get('import_logging', 'api.util', False)
 
 def import_helper(name, fromlist=None):
     
-    logging.info('Import request for name: '+str(name)+' with fromlist '+str(fromlist)+'.')
+    global do_logging
+    
+    if do_logging: logging.debug('Import logging turned on for api.util.')
+    if do_logging: logging.debug('Import request for name: "%s" with fromlist "%s".' % name, str(fromlist))
     
     try:
         
         if fromlist is None:
-            mod = __import__(name)
+            
+            if isinstance(name, list):
+                mod = __import__('.'.join(name))
+            elif isinstance(name, str):
+                mod = __import__(name)
+            else:
+                return False
+                
+            if do_logging: logging.debug('Import request successful. Returning "%s".' % str(mod))
 
         else:
-            if isinstance(fromlist, list):
-                fromlist = str(fromlist[0])
-
-            class_path_t = name.split('.')
-            class_path_t.append(fromlist)
             
-            logging.info('Would split like this: from '+str('.'.join(class_path_t[0:-1]))+' import '+str(class_path_t[-1]))            
+            if isinstance(fromlist, str):
+                fromlist = [fromlist]
             
-            mod = __import__('.'.join(class_path_t[0:-1]), globals(), locals(), class_path_t[-1], -1)
-            mod = getattr(mod, class_path_t[-1])
+            if isinstance(name, list):
+                mod = __import__('.'.join(name), globals(), locals(), fromlist)
+                
+            elif isinstance(name, str):
+                
+                mod = __import__(name, globals(), locals, fromlist)
+                
+            mod_properties = {}
+            for prop in fromlist:
+                mod_properties[prop] = getattr(mod, prop)
             
-        return mod
+            enum_props = []
+            index_props = {}
+             
+            for prop in fromlist:
+                item = getattr(mod, prop)
+                enum_props.append(item)
+                index_props[prop] = item
+            
+            if do_logging: logging.debug('Import request successful. Returning (with props) "%s".' % str(mod))
+                            
+            return (mod, {'list':enum_props,'dict':index_props})
+                            
         
     except ImportError:
-        #TODO: Find a way to store errors in the datastore
+        #@TODO: Find a way to store errors in the datastore
+        if do_logging: logging.error('ImportError caught. Returning False.')
         return False
+        
+    finally:
+        if do_logging: logging.debug('Import request finished.')

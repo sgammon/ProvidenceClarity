@@ -1,22 +1,64 @@
-from .. import AdapterInterface
-from ProvidenceClarity import PCController
-from ProvidenceClarity.data.data import ORIGIN_LIST, FORMAT_LIST, DataStub, BlobstoreData, WebStorageData
+import exceptions
+from ProvidenceClarity import PCController, PCAdapter, pc_config
+from ProvidenceClarity.data.data import ORIGIN_LIST, FORMAT_LIST, DataStub, DataBackend
+from ProvidenceClarity.data.core.model import Model
+from ProvidenceClarity.api.util import import_helper
+
+adapters = pc_config.get('adapters','api.storage',[])
+
 
 
 class StorageController(PCController):
-    pass
 
-class StorageAdapter(AdapterInterface):
+    @classmethod
+    def loadAdapter(cls,name):
 
-    stub = None
+        global adapters
+        
+        if backend in adapters:
+            adapter = import_helper(adapters[backend])
+        
+            if adapter == False:
+                raise exceptions.InvalidBackend()
+                
+            else:
+                ### STOPPED HERE
+                pass
+                
+    @classmethod
+    def loadStubClass(cls,adapter):
+        
+        if isinstance(adapter, (str,basestring,unicode)):
+            _adapter = DataBackend.get_by_key_name(adapter)
+
+        elif isinstance(adapter, DataBackend):
+            _adapter = adapter
+            
+        else:
+            raise exceptions.InvalidBackend()
+            
+        stub_class = import_helper(adapter.model_path)
+        if stub_class == False:
+            return False
+            
+        else:
+            return stub_class
+        
+
+class StorageAdapter(PCAdapter):
 
     @classmethod
     def store(cls, key, data):
-        pass
+        raise NotImplemented()
+
+
+    @classmethod
+    def generateStub(cls, key, data):
+        raise NotImplemented()
         
     @classmethod
     def get(cls, key):
-        pass
+        raise NotImplemented()
         
         
 class StubController(object):
@@ -24,15 +66,8 @@ class StubController(object):
     @classmethod
     def create(cls, origin, backend, format, **kwargs):
         
-        from blobstore import BlobstoreBackend
-        from webstorage import WebStorageBackend
-
-        if backend == 'blobstore':
-            d = BlobstoreData(**kwargs)
-            
-        elif backend == 'webstorage':
-            d = WebStorageData(**kwargs)
-            
+        b = StorageController.loadStubClass(backend)
+        
         if isinstance(FORMAT_LIST.index(format), int):
             d.format = format
             d.format_other = None

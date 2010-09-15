@@ -7,7 +7,7 @@ from ProvidenceClarity import pc_config
 from ProvidenceClarity.handlers import util, input, output, workers, admin, api
 
 from ProvidenceClarity.handlers.util import errors
-from ProvidenceClarity.handlers.input import receiver, scraper
+from ProvidenceClarity.handlers.input import receiver, fetcher
 from ProvidenceClarity.handlers.admin import data
 from ProvidenceClarity.handlers.workers import mail, xmpp, analyzer, data
 from ProvidenceClarity.handlers.api import data as data_api
@@ -55,10 +55,12 @@ ROUTES = [
     
     ## Input Handlers
     (rp+'/input/receiver/(.+)',receiver.ReceiverHandler),
+    (rp+'/input/fetcher/check',receiver.FetcherCronWorker),
+    (rp+'/input/fetcher/(.+)',fetcher.FetcherQueueWorker),
     
     ## Incoming API Services
-    (rp+'/_ah/xmpp/message/chat/',workers.mail.IncomingMail),
-    (rp+'/_ah/mail/.+',workers.xmpp.IncomingXMPP),
+    ('/_ah/xmpp/message/chat/',workers.xmpp.IncomingXMPP),
+    ('/_ah/mail/.+',workers.mail.IncomingMail),
     
     ## Generic Handlers
     (rp+'/error/404',util.errors.Error404),

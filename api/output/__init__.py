@@ -1,13 +1,12 @@
-from .. import AdapterInterface
-from ProvidenceClarity import PCController
-
-
-class OutputAdapter(AdapterInterface):
-    pass
+from ProvidenceClarity import PCController, PCAdapter
 
     
 class OutputController(PCController):
-    pass
-    
+
+    _subcontrollers = {'grapher':['grapher','GraphController'],'viewer':['viewer','ViewController']}
+
+
+class OutputAdapter(PCAdapter):
+    pass    
     
 _controller = OutputController

@@ -1,9 +1,9 @@
 from .. import OutputAdapter, OutputController
 
 
-class GraperController(OutputController):
+class GraphController(OutputController):
     pass
 
 
-class GrapherAdapter(OutputAdapter):
+class GraphAdapter(OutputAdapter):
     pass

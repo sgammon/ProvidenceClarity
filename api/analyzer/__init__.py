@@ -1,14 +1,16 @@
-from ProvidenceClarity import PCController
-from .. import AdapterInterface
-from . import mapper, object as obj, reducer, relation, stat
+from ProvidenceClarity import PCController, PCAdapter
 
 
 class AnalyzerController(PCController):
 
-    _submodules = {mapper, obj, reducer, relation, stat}
+    _subcontrollers = {'mapper':['mapper','MapperController'],
+                       'object':['object','ObjectAnalyzerController'],
+                       'reducer':['reducer','ReducerController'],
+                       'relation':['relation','RelationAnalyzerController'],
+                       'graph':['graph','GraphAnalyzerController']}
     
     
-class AnalyzerAdapter(AdapterInterface):
+class AnalyzerAdapter(PCAdapter):
     pass
     
     

@@ -1,7 +1,7 @@
 from google.appengine.ext import db
-from ProvidenceClarity.api.data import DataManager
+from ProvidenceClarity.api.data import DataManager, DataJob
 from ProvidenceClarity.data.util import CreatedModifiedMixin
-from ProvidenceClarity.data.input import DataInput
+from ProvidenceClarity.data.data import DataStub, DataJobEntry
 from ProvidenceClarity.data.mapreduce import MapperParam
 from ProvidenceClarity.data.core.model import Model
 from ProvidenceClarity.data.core.expando import Expando
@@ -13,6 +13,7 @@ class AnalyzerEngine(Model, CreatedModifiedMixin):
     """ Abstract ancestor class describing a data processing engine that can be used by the Analyzer module. """
     
     handler_path = db.StringProperty()
+    description = db.TextProperty()
     
     
 class AnalyzerTemplate(Model, CreatedModifiedMixin):
@@ -21,37 +22,8 @@ class AnalyzerTemplate(Model, CreatedModifiedMixin):
     
     pass
     
-
-class DataJob(PolyModel, CreatedModifiedMixin):
-
-    """ Abstract ancestor class describing a data processing job. """
     
-    status = db.StringProperty(choices=['queued','paused','processing','error','complete'])
-    in_data = db.ReferenceProperty(DataInput, collection_name="jobs")
-    out_storage = db.StringProperty(choices=['datastore','blobstore','bigstorage'])
-    
-    ## Job Progress
-    analyzer_process = db.ListProperty(db.Key)
-    current_analyzer = db.ReferenceProperty(AnalyzerEngine, collection_name="current_jobs")
-    
-    ## Status Flags
-    complete = db.BooleanProperty()
-    queued = db.BooleanProperty()
-    error = db.BooleanProperty()
-    processing = db.BooleanProperty()
-    
-    ## Scheduling
-    do_after = db.DateTimeProperty()
-    do_on = db.DateTimeProperty()
-    
-    ## Audit Trail
-    queued_stamp = db.DateTimeProperty()
-    error_stamp = db.DateTimeProperty()
-    processing_stamp = db.DateTimeProperty()
-    completed_stamp = db.DateTimeProperty()
-    
-    
-class MapReduceJob(DataJob):
+class MapReduceJob(DataJobEntry):
 
     """ Describes a Map/Reduce data processing job. """
     
@@ -64,25 +36,21 @@ class MapReduceJobParam(Expando):
     
     job = db.ReferenceProperty(MapReduceJob, collection_name="params")
     param = db.ReferenceProperty(MapperParam, collection_name="mapped_params")
-    
-    
-class DirectStorageJob(DataJob):
-
-    """ Describes a data processing job executed from a simple Python module. """
-    
-    python_mod = db.ListProperty(basestring)
-    
+        
     
 ## Proto Inserts
-
 class ProtoHelper(DataManager):
 
     def insert(self):
         
-        self.models.append(self.P(_class=DataJob,
-                             direct_parent=None,ancestry_path=[],abstract=True,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
-                             created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
-                             
+        self.models.append(self.P(_class=AnalyzerEngine,
+                                    direct_parent=None,ancestry_path=[],abstract=False,derived=True,is_data=False,poly_model=False,uses_keyname=True,uses_parent=False,uses_id=False,
+                                   created_modified=True,keyname_use='Unique name of analyzer engine.',keyid_use=None,keyparent_use=None))
+
+        self.models.append(self.P(_class=AnalyzerTemplate,
+                                    direct_parent=None,ancestry_path=[],abstract=False,derived=False,is_data=False,poly_model=False,uses_keyname=False,uses_parent=False,uses_id=False,
+                                   created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
+
         self.models.append(self.P(_class=MapReduceJob,
                                     direct_parent=db.Key.from_path('P','DataJob'),ancestry_path=['DataJob'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
@@ -90,22 +58,21 @@ class ProtoHelper(DataManager):
         self.models.append(self.P(_class=MapReduceJobParam,
                                     direct_parent=None,ancestry_path=[],abstract=False,derived=False,is_data=False,poly_model=False,expando=True,uses_keyname=True,uses_parent=True,uses_id=False,
                                    created_modified=True,keyname_use='Name for param.',keyid_use=None,keyparent_use='Job that owns param and value.'))
-                                   
-        self.models.append(self.P(_class=DirectStorageJob,
-                                    direct_parent=db.Key.from_path('P','DataJob'),ancestry_path=['DataJob'],abstract=False,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
-                                   created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
         
         return self.models
 
     def base(self):
         
         self.models.append(AnalyzerEngine(key_name='object',
+                            description='Extracts and creates entities from submitted data.',
                             handler_path='ProvidenceClarity.api.analyzer.object'))
                             
         self.models.append(AnalyzerEngine(key_name='relation',
+                            description='Extracts and creates relationships between submitted entities.',
                             handler_path='ProvidenceClarity.api.analyzer.relation'))
                             
         self.models.append(AnalyzerEngine(key_name='stat',
+                            description='Generates graph segments and relates entities beyond layer 2 relationships.',
                             handler_path='ProvidenceClarity.api.analyzer.stat'))
         
 
@@ -114,9 +81,9 @@ class ProtoHelper(DataManager):
 
     def clean(self):
         
-        self.models.append(self.P.get_by_key_name('DataJob'))
+        self.models.append(self.P.get_by_key_name('AnalyzerEngine'))
+        self.models.append(self.P.get_by_key_name('AnalyzerTemplate'))
         self.models.append(self.P.get_by_key_name('MapReduceJob'))
         self.models.append(self.P.get_by_key_name('MapReduceJobParam'))
-        self.models.append(self.P.get_by_key_name('DirectStorageJob'))
         
         return self.models

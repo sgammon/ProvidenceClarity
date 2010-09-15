@@ -1,12 +1,9 @@
-from .. import AnalyzerController, AnalyzerAdapter
+from ProvidenceClarity.api.analyzer import AnalyzerController, AnalyzerAdapter
 
 
-class ReducerController(AnalyzerController):
+class ReducerAnalyzerController(AnalyzerController):
     pass
 
 
 class ReducerAnalyzer(AnalyzerAdapter):
     pass
-    
-    
-_controller = ReducerController

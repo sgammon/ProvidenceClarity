@@ -4,6 +4,7 @@ from ProvidenceClarity.data.util import CreatedModifiedMixin
 from ProvidenceClarity.data.core.model import Model
 from ProvidenceClarity.data.core.expando import Expando
 
+
 class SystemProperty(Expando, CreatedModifiedMixin):
     
     """ Describes a basic system property (similar to Microsoft Windows' registry). """
@@ -11,6 +12,7 @@ class SystemProperty(Expando, CreatedModifiedMixin):
     name = db.StringProperty(indexed=True)
     module = db.StringListProperty(indexed=True)
     last_access = db.DateTimeProperty()
+
     
 class TempSystemProperty(Expando, CreatedModifiedMixin):
     

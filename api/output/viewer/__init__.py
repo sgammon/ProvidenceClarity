@@ -1,9 +1,9 @@
 from .. import OutputAdapter, OutputController
 
 
-class ViewerController(OutputController):
+class ViewController(OutputController):
     pass
 
 
-class Viewer(OutputAdapter):
+class ViewAdapter(OutputAdapter):
     pass

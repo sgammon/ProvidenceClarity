@@ -1,7 +1,9 @@
 from google.appengine.ext import db
 from ProvidenceClarity.api.data import DataManager
+from ProvidenceClarity.data.data import DataStub
 from ProvidenceClarity.data.core.polymodel import PolyModel
 from ProvidenceClarity.api.data.proto import ProtoModel
+
 
 ##### ### Master Descriptor Classes ### #####
 
@@ -20,33 +22,42 @@ class DescriptorModel:
     """ Provides methods and properties for models that are descriptor-enabled. """    
     pass
 
+
 ##### ###   Built-In Descriptors   ### #####
 
 class IndexingDescriptor(D):
     """ Describes status and configuration of indexing for a model or kind. """
     last_indexed = db.DateTimeProperty(default=None,verbose_name='Last Indexed')
     marked_for_index = db.BooleanProperty(verbose_name='Mark for Indexing')
+
     
 class CachingDescriptor(D):
     """ Describes status and configuration of caching for a model or kind. """
     do_cache = db.BooleanProperty(default=True,verbose_name="Enable Cache")
+
     
 class StatDescriptor(D):
     """ Describes status and configuration of statistics generation for a model or kind. """
     node_value = db.FloatProperty(default=1.0)
     node_multiplier = db.FloatProperty(default=1.0)
+
     
 class RevisionDescriptor(D):
     """ Describes revision history and increments revision count. """
     pass
+
     
 class SourceDescriptor(D):
     """ Describes a source for this data point. """
     pass
+
     
 class StorageRefDescriptor(D):
+    
     """ Describes this data point as it exists in another storage system. """
-    pass
+    
+    stub = db.ReferenceProperty(DataStub, collection_name='ref_descriptors')
+
     
 class ExtSchemaDescriptor(D):
     """ Links a record to an external schema. """
@@ -66,8 +77,8 @@ class FreebaseSchema(ExtSchemaDescriptor):
     schema_set = db.ListProperty(basestring)
     schema_path = db.StringProperty()
     
+    
 ## Proto Inserts
-
 class ProtoHelper(DataManager):
 
     def insert(self):

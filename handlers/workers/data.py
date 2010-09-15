@@ -81,10 +81,6 @@ class TransactionWorker(RequestHandler):
                                 cache_task.add(cache_queue.name, transactional=True)
 
 
-                            logging.info('Adding E and N to commit list...')
-                            commit_list['puts'].append(entity)
-                            commit_list['puts'].append(natural)
-
                             ## @TODO: figure out way to merge descriptors in and put them too
                             
                             #if ticket.attachments is not None:
@@ -93,7 +89,7 @@ class TransactionWorker(RequestHandler):
                                     
                             logging.info('Putting commit list...')
 
-                            return db.put(commit_list['puts'])
+                            return True
                     
                     elif mode == 'entityUpdate':
                     

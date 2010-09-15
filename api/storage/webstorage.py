@@ -1,7 +1,7 @@
 from . import StorageAdapter
 
 
-class WebStorageBackend(StorageAdapter):
+class WebStorageAdapter(StorageAdapter):
     
     @classmethod
     def store(cls, key, data):

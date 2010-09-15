@@ -1,1 +1,1 @@
-__protos__ = ['analyzer','attribute','cache','data','descriptor','entity','index','input','proto','relationship','services','security','system','util']
+__protos__ = ['analyzer','attribute','cache','data','descriptor','entity','index','input','mapreduce','proto','relation','services','security','system','util']

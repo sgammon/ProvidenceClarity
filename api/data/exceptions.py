@@ -1,4 +1,4 @@
-from ProvidenceClarity.main import PCException
+from ProvidenceClarity.exceptions import PCException
 
 
 class DataAPIException(PCException): pass

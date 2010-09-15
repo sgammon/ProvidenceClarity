@@ -176,6 +176,8 @@ class SecurityKeyController(PCController):
             # check usage limit
             if config.get('security','key_invalid_access_limit',True) < key.use_tally:
                 raise exceptions.KeyAccessLimitReached 
+
+            return True
                     
         except:
             
@@ -186,11 +188,7 @@ class SecurityKeyController(PCController):
             # Re-raise exception and return false
             raise sys.exc_info()[0]
             return False
-            
-        else:
-            
-            # Return true if all tests pass
-            return True
+
             
             
 _controller = SecurityController

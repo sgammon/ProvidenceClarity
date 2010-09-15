@@ -17,3 +17,7 @@ class APIInvalid(APIException): pass
 
 class ControllerException(PCException): pass
 class InvalidController(ControllerException): pass
+
+class ExtensionException(PCException): pass
+class ExtensionNotImplemented(ExtensionException): pass
+class ExtensionInvalid(ExtensionException): pass

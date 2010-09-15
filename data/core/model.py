@@ -1,8 +1,10 @@
 from google.appengine.ext import db
+from ProvidenceClarity import ProvidenceClarityObject
 from . import _PC_MODEL_BRANCH_BASE
 
 
-class Model(db.Model):
+
+class Model(db.Model, ProvidenceClarityObject):
 
     """ Root, master, non-polymorphic data model. Everything lives under this class. """
 
@@ -28,8 +30,11 @@ class Model(db.Model):
 
     def _getClassPath(self, seperator=None):
 
-        path = [cls.__name__ for cls in self.__class_hierarchy__]
+        if hasattr(self, '__class_hierarchy__'):
+            path = [cls.__name__ for cls in self.__class_hierarchy__]
         
-        if seperator is not None:
-            return seperator.join(path)
-        return path
+            if seperator is not None:
+                return seperator.join(path)
+            return path
+        else:
+            return False

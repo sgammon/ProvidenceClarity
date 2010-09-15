@@ -1,4 +1,4 @@
-from .. import AnalyzerController, AnalyzerAdapter
+from ProvidenceClarity.api.analyzer import AnalyzerController, AnalyzerAdapter
 
 
 class RelationAnalyzerController(AnalyzerController):
@@ -7,6 +7,3 @@ class RelationAnalyzerController(AnalyzerController):
 
 class RelationAnalyzer(AnalyzerAdapter):
     pass
-    
-    
-_controller = RelationAnalyzerController

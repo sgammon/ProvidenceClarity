@@ -5,6 +5,7 @@ from ProvidenceClarity.data.core.expando import Expando
 from ProvidenceClarity.data.core.polymodel import PolyModel
 from ProvidenceClarity.data.util import CreatedModifiedMixin
 
+
 class C(PolyModel, CreatedModifiedMixin):
     
     """ Basic caching model. """
@@ -12,11 +13,11 @@ class C(PolyModel, CreatedModifiedMixin):
     ## Expiration items
     expiration_enabled = db.BooleanProperty(required=True,default=True,verbose_name="Auto-Expiration?")
     default_expiration = db.IntegerProperty(required=True,default=86400,verbose_name="Default Expiration")
+
     
 class NC(Model, CreatedModifiedMixin):
     
-    """ A normalized cache that transcends properties of all proto-type caches. """
-    
+    """ A normalized cache that transcends properties of all proto-type caches. """    
     pass
     
 
@@ -38,7 +39,6 @@ class NormalizedObject(Expando):
     
 
 ## Proto Inserts
-
 class ProtoHelper(DataManager):
 
     def insert(self):

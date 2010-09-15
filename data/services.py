@@ -1,8 +1,9 @@
 from google.appengine.ext import db
 from ProvidenceClarity.api.data import DataManager
 from ProvidenceClarity.data.core.model import Model
+from ProvidenceClarity.data.core.polymodel import PolyModel
 from ProvidenceClarity.data.util import CreatedModifiedMixin
-
+    
 
 class ServiceAdapter(Model, CreatedModifiedMixin):
     
@@ -13,6 +14,20 @@ class ServiceAdapter(Model, CreatedModifiedMixin):
     homepage = db.LinkProperty()
     docs = db.LinkProperty()
     adapter_handler = db.StringProperty()
+    requires_auth = db.BooleanProperty()
+
+
+class AuthKey(PolyModel, CreatedModifiedMixin):
+    
+    """ Describes an abstract key used to connect to an external service. """
+    
+    service = db.ReferenceProperty(ServiceAdapter, collection_name='auth_keys')
+    global_use_limit = db.IntegerProperty(default=0)
+    daily_use_limit = db.IntegerProperty(default=0)
+    name = db.StringProperty()
+    value = db.TextProperty()
+    expires = db.BooleanProperty()
+    expiration = db.DateTimeProperty()
     
 
 class ServiceRequest(Model, CreatedModifiedMixin):
@@ -35,6 +50,10 @@ class ProtoHelper(DataManager):
                                     direct_parent=None,ancestry_path=[],abstract=False,derived=True,is_data=False,poly_model=False,uses_keyname=True,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use='Unique service name.',keyid_use=None,keyparent_use=None))
                                    
+        self.models.append(self.P(_class=AuthKey,
+                                    direct_parent=None,ancestry_path=[],abstract=True,derived=False,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
+                                   created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
+                                   
         self.models.append(self.P(_class=ServiceRequest,
                                     direct_parent=None,ancestry_path=[],abstract=False,derived=False,is_data=False,poly_model=False,uses_keyname=False,uses_parent=True,uses_id=True,
                                    created_modified=True,keyname_use=None,keyid_use='Unique number for request.',keyparent_use='Service adapter request was issued to.'))
@@ -54,6 +73,7 @@ class ProtoHelper(DataManager):
     def clean(self):
         
         self.models.append(self.P.get_by_key_name('ServiceAdapter'))
+        self.models.append(self.P.get_by_key_name('AuthKey'))
         self.models.append(self.P.get_by_key_name('ServiceRequest'))
         
         return self.models

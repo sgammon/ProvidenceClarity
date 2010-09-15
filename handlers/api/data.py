@@ -2,7 +2,7 @@ import logging
 from google.appengine.ext import db
 from . import DataAPIHandler
 
-from ProvidenceClarity.data import entity, proto, index, cache, descriptor, relationship
+from ProvidenceClarity.data import entity, proto, index, cache, descriptor, relation
 
 
 def get_type_q(typename):

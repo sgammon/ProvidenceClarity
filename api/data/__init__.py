@@ -46,23 +46,24 @@ OTHER_TYPE_FLAG = '_other_'
 # Abstract class for data-handling API modules
 class DataController(PCController):
     
-    _subcontrollers = {'proto':['proto','ProtoController'],'tasks':['tasks','TaskController'],'transaction':['transaction','TransactionController']}
+    _subcontrollers = {'proto':['proto','ProtoController'],
+                       'jobs':['jobs','JobController'],
+                       'transaction':['transaction','TransactionController'],
+                       'relation':['relation','RelationController'],
+                       'stub':['stub','StubController'],
+                       'descriptor':['descriptor','DescriptorController']}
+    
     
     @classmethod
     def import_model(cls, classpath):
 
-        logging.info('===== Import Model Request =====')
-
         if isinstance(classpath, list):
-            logging.info('Classpath is list: '+'.'.join(classpath[0:-1])+' with endpoint '+classpath[-1])
             imported_class = import_helper('.'.join(classpath[0:-1]),classpath[-1])
         
         elif isinstance(classpath, (str, unicode)):
-            logging.info('Classpath is string: '+classpath)
             imported_class = import_helper(classpath)
             
         else:
-            logging.critical('Classpath is neither list nor str but actually '+str(type(classpath))+'.')
             return False
         
         return imported_class
@@ -79,17 +80,92 @@ class DataController(PCController):
                     else:
                         raise exceptions.InvalidPolyInput('Cannot convert root E to a natural kind.') ## @TODO: String Localization
                 else:
-                    if softfail is True:
-                        return (entity, None)
-                    else:
-                        raise exceptions.InvalidPolyInput('Cannot convert entity with root other than __POLY__ to a natural kind.')
-        try:
-            ## Grab entity key name, if any
-            if hasattr(entity, '_key_name'):
-                pass #### LEFT OFF HERE!!!!! ###
+                    try:
+            
+                        ## Get and filter properties
+                        e_prop = cls._filterEntityPropertiesToE(entity.properties())
+                        n_prop = cls._filterEntityPropertiesToNatural(entity.properties())
+            
+                        ## Generate new class objects
+                        N_ClassObj = type(entity.class_key()[-1], (Expando,), n_prop)
+                        E_ClassObj = entity.__class__
+            
+                        ## Generate entity instance
+                        if hasattr(entity, '_key_name'):
+                            E_InstObj = E_ClassObj(key_name=entity._key_name)
+                        else:
+                            E_InstObj = E_ClassObj()
+
+                        ## Copy over entity properties
+                        for prop in e_prop:
+                            setattr(E_InstObj, prop, e_prop[prop])
                 
-        except:
-            pass
+                        ## Put Entity
+                        E_KeyObj = db.put(E_InstObj)
+            
+                        ## Generate natural instance
+                        if hasattr(entity, '_key_name'):
+                            N_InstObj = N_ClassObj(E_InstObj,key_name=entity._key_name)
+                        else:
+                            N_InstObj = N_ClassObj(E_InstObj)
+
+                        ## Copy over natural properties
+                        for prop in n_prop:
+                            setattr(N_InstObj, prop, n_prop[prop])
+
+                        ## Put Natural
+                        N_KeyObj = db.put(N_InstObj)
+
+                        ## Update entity proto
+                        E_InstObj.natural_kind = N_InstObj
+            
+                        ## Put Entity
+                        db.put(E_InstObj)
+            
+                        return (E_KeyObj, N_KeyObj)
+                            
+                    except:
+                        raise Exception() ## @TODO: Replace with defined exception
+                    
+            else:
+                if softfail is True:
+                    return (entity, None)
+                else:
+                    raise exceptions.InvalidPolyInput('Cannot convert entity with root other than __POLY__ to a natural kind.')                    
+        
+            
+    @classmethod
+    def _filterEntityPropertiesToE(cls, entity):
+        props = entity.properties()
+        if not isinstance(props, dict):
+            raise Exception() # @TODO: Replace with defined exception
+        else:
+            e_prop = {}
+            for item in props:
+                if props[item] in e.E_ALWAYS_INDEXED+e.E_INDEXED:
+                    e_prop[item] = props[item]
+            return e_prop
+                    
+            
+    @classmethod
+    def _filterEntityPropertiesToNatural(cls, entity):
+        props = entity.properties()
+        if not isinstance(props, dict):
+            raise Exception() # @TODO: Replace with defined exception
+        else:
+            n_prop = {}
+            for item in props:
+
+                if props[item].__class__ in [_ClassKeyProperty, _ModelPathProperty]:
+                    continue ## ignore classkey and modelpath properties
+
+                elif props[item].__class__ == db.ReferenceProperty:
+                    n_prop[item] = db.ReferenceProperty(collection_name=item+'_n')
+            
+                else:
+                    n_prop[item] = props[item]
+            return n_prop
+        
         
     @classmethod
     def generateNaturalKind_legacy(cls, entity, softfail=False, **kwargs):
@@ -160,7 +236,6 @@ class DataController(PCController):
         
         return t_entity, natural_kind_record
         
-        
 
 # Utility class for proto and dev structure
 class DataManager(object):
@@ -169,20 +244,25 @@ class DataManager(object):
     entities = []
     P = None
     
+    
     def __init__(self):
         from ProvidenceClarity.data.proto import P
         self.P = P
     
+    
     def do_test(self):
         logging.info('MANAGER: TEST COMPLETE!')
+    
     
     ## passed down to child classes
     def insert(self):
         pass
     
+    
     ## passed down to child classes
     def clean(self):
         pass
+     
         
     def sanitize(self, data):
         
@@ -266,6 +346,7 @@ class DataManager(object):
                 return False
                 
             return (True,res)
+     
             
     def do_base(self):
         

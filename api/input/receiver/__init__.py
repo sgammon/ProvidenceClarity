@@ -3,11 +3,13 @@ from .. import InputAdapter, InputController
 import exceptions
 from ProvidenceClarity.data.input import DataReceiver
 from ProvidenceClarity.data.core.model import Model
+from ProvidenceClarity.api.util import import_helper
 from ProvidenceClarity.api.storage import StubController
 
-class ReceiverController(InputAdapter, InputController):
+class ReceiverController(InputController):
 
-    model = None        
+    model = None
+    handler = None    
 
     ## Retrieve receiver for use
     @classmethod
@@ -23,11 +25,27 @@ class ReceiverController(InputAdapter, InputController):
                 raise exceptions.ReceiverDisabled()
             else:
                 self.model = d
+                if d.data_handler is not None:
+                    
+                    data_handler = None
+                    mod, prop = import_helper(d.data_handler[0:-1],d.data_handler[-1])
+                    
+                    if issubclass(prop, DataReceiver):
+                        data_handler = prop[d.data_handler[-1]]
+                    else:
+                        raise exceptions.InvalidDataHandler()
+                    
                 if for_use:
-                    return d
+                    return (d, data_handler)
                 else: return True
         else:
             raise exceptions.ReceiverNotFound()
+            
+            
+    @classmethod
+    def loadAdapter(cls, path):
+        
+        pass
             
     
     ## Create a new receiver
@@ -52,14 +70,17 @@ class ReceiverController(InputAdapter, InputController):
         
         return StubController.create('receiver',r.storage_backend,r.format)
         
-
-class ReceiverHandler(object):
+        
+class ReceiverAdapter(InputAdapter):
     
     """ Receiver extensions external to P/C extend this. """
 
     data = None # Raw Data
     p_data = None # Processed Data
 
+
+    def adapt(self, input):
+        return self.process_data(input)
 
     def process_data(self, data):
 

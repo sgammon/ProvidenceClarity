@@ -23,13 +23,14 @@ _class_map = {}
 
 
 ## +=+=+ Metaclass controlling the creation of Providence/Clarity polymodel objects.
-class ProvidenceClarityPolyClass(db.PropertiedClass):
+class PolymorphicModel(db.PropertiedClass):
+
     """ Populates properties like __root_class__ and __class_hierarchy__ and enforces logic about direct instantiation. """
 
     def __init__(cls, name, bases, dct):
             
         if name == 'PolyModel':
-            super(ProvidenceClarityPolyClass, cls).__init__(name, bases, dct, map_kind=False)
+            super(PolymorphicModel, cls).__init__(name, bases, dct, map_kind=False)
             return
 
         elif PolyModel in bases:
@@ -38,10 +39,10 @@ class ProvidenceClarityPolyClass(db.PropertiedClass):
                 '__class_hierarchy__ is already defined.') % cls.__name__)
             cls.__class_hierarchy__ = [cls]
             cls.__root_class__ = cls
-            super(ProvidenceClarityPolyClass, cls).__init__(name, bases, dct)
+            super(PolymorphicModel, cls).__init__(name, bases, dct)
             
         else:
-            super(ProvidenceClarityPolyClass, cls).__init__(name, bases, dct, map_kind=False)
+            super(PolymorphicModel, cls).__init__(name, bases, dct, map_kind=False)
 
             cls.__class_hierarchy__ = [c for c in reversed(cls.mro())
                 if issubclass(c, PolyModel) and c != PolyModel]
@@ -121,7 +122,7 @@ class PolyModel(Model):
 
     """
 
-    __metaclass__ = ProvidenceClarityPolyClass
+    __metaclass__ = PolymorphicModel
 
     ## stores class inheritance/ancestry (list property)
     _class_property = _ClassKeyProperty(name=_CLASS_KEY_PROPERTY)

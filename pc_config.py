@@ -22,10 +22,23 @@ config = {
     'logging':
     {
         'handler':logging,
+        'global_queue':False,
         'tag':True,
         'threshold':'debug'
     },
     
+    'api.util':
+    {
+        'import_logging':False,
+    },
+    
+    'api.storage':
+    {
+        'adapters':{'datastore':'ProvidenceClarity.api.storage.datastore.DatastoreAdapter',
+                    'blobstore':'ProvidenceClarity.api.storage.blobstore.BlobstoreAdapter',
+                    'webstorage':'ProvidenceClarity.api.storage.webstorage.WebStorageAdapter'}
+    },
+
     'api.data.proto.ProtoController':
     {
         'log_imports':True,

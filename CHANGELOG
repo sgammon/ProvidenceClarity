@@ -1,7 +1,9 @@
 ================================== Providence/Clarity Changelog ==================================
 
 0.1.6.000 DEV:
+-- Scrapers renamed to Fetchers (scraping is a kind of job, not an input verb)
 -- new PCStateProxy object on prop 'state' on Platform for managing app state
+-- PCStateProxy automatically boots information regarding environment & capabilities
 -- new PCClockProxy object on prop 'clock' on Platform for managing app timepoints
 -- new PCAPIProxy object on prop 'api' on Platform for proxying controller requests
 -- new DataController methods for automated queued task management

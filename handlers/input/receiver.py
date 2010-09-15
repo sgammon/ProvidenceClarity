@@ -1,6 +1,7 @@
 from .. import RequestHandler
 from ProvidenceClarity.api.util import import_helper
-from ProvidenceClarity.api.analyzer import AnalyzerController
+from ProvidenceClarity.api.data import DataController
+from ProvidenceClarity.api.data.stub import StubController
 from ProvidenceClarity.api.input.receiver import ReceiverController
 
 
@@ -16,26 +17,20 @@ class ReceiverHandler(RequestHandler):
         
         if receiver_key is not False:
             
-            data = self.request.get('content',default_value=None)
+            data = self.request.body
+
             if data is None:
                 self.render_raw('Must provide some post content') # @TODO: Uniform exception/error formatting here
             else:
             
                 r = ReceiverController.getAndValidate(receiver_key)
-                if r.data_handler is not None:
-
-                    m = import_helper(r.data_handler)
-                    p_data = m.process_data(data)
-                    
-                    if r.storage_backend == 'datastore':
-                        db.put(p_data)
-                    
-                    else:
-                        if r.discard_after_handler != True:
-                            d_stub = ReceiverController.get_stub(p_data,r) ## @TODO: Fill out store methods
-                            stubkey = StubController.store(d_stub)
+                d_stub = StubController.get
+                
+                d_stub = ReceiverController.get_stub(p_data,r) ## @TODO: Fill out store methods <--- CHECK
+                stubkey = StubController.store(d_stub)
                 
                 else:
+                    r = ReceiverController.getAndValidate(receiver_key)
                     d_stub = ReceiverController.get_stub(data,r)
                     StubController.store(d_stub)
                 
