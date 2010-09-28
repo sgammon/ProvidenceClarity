@@ -1,5 +1,5 @@
 from google.appengine.ext import db
-from ProvidenceClarity import ProvidenceClarityObject
+from ProvidenceClarity.core import ProvidenceClarityObject
 from . import _PC_MODEL_BRANCH_BASE
 
 

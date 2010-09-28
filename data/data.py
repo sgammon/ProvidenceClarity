@@ -161,7 +161,7 @@ class DataJob(PolyModel, CreatedModifiedMixin):
 
     """ Abstract ancestor class describing a data processing job. """
     
-    status = db.StringProperty(choices=['queued','paused','processing','error','complete'])
+    status = db.StringProperty(choices=['prequeued','queued','paused','processing','error','complete'])
     in_data = db.ReferenceProperty(DataStub, collection_name="in_jobs")
     out_data = db.ReferenceProperty(DataStub, collection_name="out_jobs")
     out_storage = db.StringProperty(choices=['datastore','blobstore','bigstorage'])
@@ -196,6 +196,16 @@ class DataJobTemplate(Expando):
     
     name = db.StringProperty()
     arguments = db.ListProperty(db.Key)
+    
+
+class#### HERE    
+
+    
+class DataJobTemplateEntry(PolyModel, CreatedModifiedMixin):
+    
+    """ A component of a datajobtemplate. """
+    
+    pass
     
     
 class DataJobEntryArgument(Expando):
@@ -264,10 +274,6 @@ class ProtoHelper(DataManager):
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
                                    
         self.models.append(self.P(_class=DatastoreData,
-                                    direct_parent=db.Key.from_path('P','DataStub'),ancestry_path=['DataStub'],abstract=False,derived=True,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
-                                   created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
-                                   
-        self.models.append(self.P(_class=S3Data,
                                     direct_parent=db.Key.from_path('P','DataStub'),ancestry_path=['DataStub'],abstract=False,derived=True,is_data=False,poly_model=True,uses_keyname=False,uses_parent=False,uses_id=False,
                                    created_modified=True,keyname_use=None,keyid_use=None,keyparent_use=None))
                                    

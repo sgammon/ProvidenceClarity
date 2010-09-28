@@ -14,7 +14,7 @@ config = {
         'enable':True,
         'default_namespace':'_global_',
         'force_namespace':False,
-        'logging': True,
+        'logging': False,
         'apps_mode_force':False,
         'apps_subdomain':'apps',
     },
@@ -41,7 +41,7 @@ config = {
 
     'api.data.proto.ProtoController':
     {
-        'log_imports':True,
+        'log_imports':False,
     },
     
     'data.entity.E':

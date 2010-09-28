@@ -44,5 +44,9 @@ class StubController(DataController):
             if 'key_name' in kwargs:
                 del kwargs['key_name']
             
-            
+
+    @classmethod
+    def store(cls, stub):
+        
+        pass
             

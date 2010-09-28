@@ -23,26 +23,17 @@ class ReceiverHandler(RequestHandler):
                 self.render_raw('Must provide some post content') # @TODO: Uniform exception/error formatting here
             else:
             
+                ## Get receiver ticket
                 r = ReceiverController.getAndValidate(receiver_key)
-                d_stub = StubController.get
                 
-                d_stub = ReceiverController.get_stub(p_data,r) ## @TODO: Fill out store methods <--- CHECK
+                ## Generate data stub & store data
+                d_stub = StubController.create(r.default_data_backend, r.default_format, 'input', r)
                 stubkey = StubController.store(d_stub)
                 
-                else:
-                    r = ReceiverController.getAndValidate(receiver_key)
-                    d_stub = ReceiverController.get_stub(data,r)
-                    StubController.store(d_stub)
-                
-                if r.queue_analysis_job == True:
-                    
-                    if r.analysis_template is not None:
-                        i_template = r.analysis_template
-                    else:
-                        i_template = None
-                    
-                    ## todo
-                    r = AnalyzerController.addJob(stub=d_stub,source='receiver',template=r.analysis_template)
+                ## Resolve job template
+                if r.default_job_template is not None:
+                    pass ## LEFT OFF HERE WORKING ON JOB CONTROLLER
+
             
         else:
             self.render_raw('Must provide a receiver key') # @TODO: Integrated error/format handling like the Data API

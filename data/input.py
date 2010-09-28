@@ -1,5 +1,5 @@
 from google.appengine.ext import db
-from ProvidenceClarity.api.data import DataManager
+from ProvidenceClarity.api.data import DataManager, DataBackend
 from ProvidenceClarity.data.util import CreatedModifiedMixin
 from ProvidenceClarity.data.core.polymodel import PolyModel
 
@@ -18,8 +18,9 @@ class DataReceiver(DataInput, CreatedModifiedMixin):
     
     """ Represents an endpoint for receiving data sent to P/C. """
     
-    data_handler = db.ListProperty(basestring,default=None)
-    discard_after_handler = db.BooleanProperty(default=None)
+    default_format = db.StringProperty()
+    default_storage_backend = db.ReferenceProperty(DataBackend, collection_name='receivers', required=True)
+    default_job_template = db.ReferenceProperty(DataJobTemplate, required=True)
     
     
 class DataFetcher(DataInput, CreatedModifiedMixin): """ Describes a data fetcher. Usually runs on a cron. """
